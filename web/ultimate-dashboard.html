@@ -454,27 +454,147 @@
                     
                     <!-- Main Chart Panel -->
                     <div class="flex-1 glass rounded-xl border border-trading-border animate-fade-in">
-                        <div class="p-4 border-b border-trading-border flex items-center justify-between">
-                            <div class="flex items-center space-x-4">
-                                <h2 class="text-lg font-bold text-neon-blue">AAPL - Apple Inc.</h2>
-                                <div class="flex items-center space-x-2">
-                                    <span class="text-2xl font-mono font-bold text-neon-green" x-text="currentPrice">$189.47</span>
-                                    <span class="text-sm font-mono" :class="priceChange >= 0 ? 'text-neon-green' : 'text-red-400'" x-text="formatPriceChange(priceChange)">+2.34 (+1.25%)</span>
+                        <div class="h-96 chart-container">
+                            <!-- AI Brain Smart Summary (default view) -->
+                            <div class="w-full h-full flex flex-col p-2" x-show="activeNav !== 'ai-brain'">
+                                <!-- AI Thought Process Header -->
+                                <div class="flex items-center justify-between p-3 bg-gradient-to-r from-gray-900/90 to-gray-800/90 rounded-lg border border-neon-blue/40 mb-2">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-neon-blue to-neon-purple flex items-center justify-center animate-pulse">
+                                            <i class="fas fa-brain text-base text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-base font-bold bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+                                                AI NEURAL CORE - THOUGHT PROCESS
+                                            </h3>
+                                            <p class="text-xs text-gray-400">Real-time cognitive analysis and decision making</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <div class="text-xs text-gray-400">
+                                            Confidence: <span class="text-neon-green font-mono font-bold text-sm">87%</span>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <div class="w-1.5 h-1.5 bg-neon-green rounded-full animate-pulse"></div>
+                                            <div class="w-1.5 h-1.5 bg-neon-blue rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                                            <div class="w-1.5 h-1.5 bg-neon-purple rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Dense AI Analysis Content -->
+                                <div class="flex-1 bg-gradient-to-br from-gray-900/50 to-gray-800/50 rounded-lg border border-gray-700/50 flex flex-col">
+                                    <!-- Scrollable Content Area -->
+                                    <div class="flex-1 p-3 overflow-y-auto">
+                                        <div class="space-y-2">
+                                            <!-- Current Market Analysis -->
+                                            <div class="bg-white/5 rounded p-2 border-l-2 border-neon-green">
+                                                <div class="flex items-center space-x-2 mb-1">
+                                                    <div class="w-2 h-2 bg-neon-green rounded-full animate-pulse"></div>
+                                                    <span class="text-neon-green font-bold text-xs">MARKET ANALYSIS</span>
+                                                </div>
+                                                <p class="text-xs text-gray-300 leading-tight">
+                                                    Detecting strong bullish momentum in AAPL. Price action shows breakout above $188.50 resistance with volume confirmation. 
+                                                    RSI at 65 indicates healthy uptrend without overbought conditions. MACD showing bullish crossover with expanding histogram.
+                                                </p>
+                                            </div>
+
+                                            <!-- Neural Processing Status -->
+                                            <div class="bg-white/5 rounded p-2 border-l-2 border-neon-blue">
+                                                <div class="flex items-center space-x-2 mb-1">
+                                                    <div class="w-2 h-2 bg-neon-blue rounded-full animate-pulse"></div>
+                                                    <span class="text-neon-blue font-bold text-xs">NEURAL PROCESSING</span>
+                                                </div>
+                                                <p class="text-xs text-gray-300 leading-tight">
+                                                    847,293 neural pathways active. Processing 20 stocks across 1M, 5M, 15M, 1H, 4H, 1D timeframes. 
+                                                    Pattern recognition algorithms identified 23 high-probability setups. Sentiment analysis shows 73% bullish bias.
+                                                </p>
+                                            </div>
+
+                                            <!-- Risk Assessment -->
+                                            <div class="bg-white/5 rounded p-2 border-l-2 border-neon-purple">
+                                                <div class="flex items-center space-x-2 mb-1">
+                                                    <div class="w-2 h-2 bg-neon-purple rounded-full animate-pulse"></div>
+                                                    <span class="text-neon-purple font-bold text-xs">RISK ASSESSMENT</span>
+                                                </div>
+                                                <p class="text-xs text-gray-300 leading-tight">
+                                                    Portfolio risk at 12% (optimal range). VIX at 18.5 suggests moderate volatility. 
+                                                    Correlation analysis shows tech sector concentration risk. Implementing position sizing based on Kelly Criterion.
+                                                </p>
+                                            </div>
+
+                                            <!-- Strategic Thinking -->
+                                            <div class="bg-white/5 rounded p-2 border-l-2 border-neon-orange">
+                                                <div class="flex items-center space-x-2 mb-1">
+                                                    <div class="w-2 h-2 bg-neon-orange rounded-full animate-pulse"></div>
+                                                    <span class="text-neon-orange font-bold text-xs">STRATEGIC ANALYSIS</span>
+                                                </div>
+                                                <p class="text-xs text-gray-300 leading-tight">
+                                                    Fed policy remains accommodative. Q3 earnings season showing 15% growth YoY. 
+                                                    Sector rotation favoring technology and healthcare. Monitoring geopolitical tensions impact on market sentiment.
+                                                </p>
+                                            </div>
+
+                                            <!-- Trade Execution Plan -->
+                                            <div class="bg-white/5 rounded p-2 border-l-2 border-neon-pink">
+                                                <div class="flex items-center space-x-2 mb-1">
+                                                    <div class="w-2 h-2 bg-neon-pink rounded-full animate-pulse"></div>
+                                                    <span class="text-neon-pink font-bold text-xs">EXECUTION PLAN</span>
+                                                </div>
+                                                <p class="text-xs text-gray-300 leading-tight">
+                                                    AAPL BUY signal confirmed. Entry: $189.50, Target 1: $195.00 (2.9% gain), Target 2: $202.00 (6.6% gain). 
+                                                    Stop loss: $186.25 (1.7% risk). Risk/Reward ratio: 1:1.7. Position size: 2.5% of portfolio.
+                                                </p>
+                                            </div>
+
+                                            <!-- Market Sentiment -->
+                                            <div class="bg-white/5 rounded p-2 border-l-2 border-yellow-400">
+                                                <div class="flex items-center space-x-2 mb-1">
+                                                    <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                                                    <span class="text-yellow-400 font-bold text-xs">SENTIMENT ANALYSIS</span>
+                                                </div>
+                                                <p class="text-xs text-gray-300 leading-tight">
+                                                    Social media sentiment: 68% bullish. Institutional flow: $2.3B net buying. 
+                                                    Options flow shows heavy call buying in tech names. Fear & Greed Index at 72 (Greed territory).
+                                                </p>
+                                            </div>
+
+                                            <!-- AI Learning Updates -->
+                                            <div class="bg-white/5 rounded p-2 border-l-2 border-cyan-400">
+                                                <div class="flex items-center space-x-2 mb-1">
+                                                    <div class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                                                    <span class="text-cyan-400 font-bold text-xs">LEARNING UPDATES</span>
+                                                </div>
+                                                <p class="text-xs text-gray-300 leading-tight">
+                                                    Model accuracy improved to 87.3% (up 2.1% this week). Reinforcement learning optimizing entry timing. 
+                                                    Backtesting shows 23.4% annual return with 0.89 Sharpe ratio over 3-year period.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Always Visible Metrics Footer -->
+                                    <div class="bg-gradient-to-r from-gray-900/90 to-gray-800/90 p-3 border-t border-gray-600/50 rounded-b-lg">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-6">
+                                                <span class="text-gray-300 text-sm">Speed: <span class="text-neon-blue font-mono font-bold">2.3ms</span></span>
+                                                <span class="text-gray-300 text-sm">Patterns: <span class="text-neon-green font-mono font-bold">23</span></span>
+                                                <span class="text-gray-300 text-sm">Accuracy: <span class="text-neon-purple font-mono font-bold">87.3%</span></span>
+                                            </div>
+                                            <div class="flex items-center space-x-3">
+                                                <span class="text-gray-300 text-sm">Neural Activity:</span>
+                                                <div class="flex space-x-1">
+                                                    <div class="w-1.5 h-4 bg-neon-green/70 rounded-full animate-pulse"></div>
+                                                    <div class="w-1.5 h-5 bg-neon-blue/80 rounded-full animate-pulse" style="animation-delay: 0.1s"></div>
+                                                    <div class="w-1.5 h-3 bg-neon-purple/70 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                                                    <div class="w-1.5 h-6 bg-neon-orange/80 rounded-full animate-pulse" style="animation-delay: 0.3s"></div>
+                                                    <div class="w-1.5 h-4 bg-neon-pink/70 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex items-center space-x-2">
-                                <template x-for="timeframe in timeframes" :key="timeframe">
-                                    <button @click="activeTimeframe = timeframe"
-                                            :class="activeTimeframe === timeframe ? 'bg-neon-blue text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
-                                            class="px-3 py-1 rounded text-xs font-medium transition-all duration-200 btn-trading"
-                                            x-text="timeframe">
-                                    </button>
-                                </template>
-                            </div>
-                        </div>
-                        <div class="p-4 h-96 chart-container">
-                            <!-- Trading Chart (default view) -->
-                            <div id="tradingChart" class="w-full h-full rounded-lg" x-show="activeNav !== 'ai-brain'"></div>
                             
                             <!-- AI Brain Process Content -->
                             <div x-show="activeNav === 'ai-brain'" class="w-full h-full flex flex-col">
