@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 Autonomous Trading Platform - Ultimate Dashboard</title>
+    <title>🧠 NEURAL CORE ALPHA-7 (NCA-7) - Ultimate Dashboard</title>
     
     <!-- Advanced Professional Libraries -->
     <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
@@ -231,33 +231,53 @@
             60%, 100% { content: '...'; }
         }
 
-        /* Market Data Circular Animation */
-        .market-data-rotate {
-            animation: circularRotate 20s linear infinite;
+        /* Market Data Pulse Animation */
+        .market-data-pulse {
+            animation: marketPulse 3s ease-in-out infinite;
         }
 
-        @keyframes circularRotate {
-            0% { transform: rotateY(0deg); }
-            100% { transform: rotateY(360deg); }
+        @keyframes marketPulse {
+            0%, 100% { 
+                box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.1);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 0 8px rgba(0, 212, 255, 0);
+                transform: scale(1.02);
+            }
         }
 
-        /* Individual Market Item Rotation */
-        .market-item-rotate {
-            animation: itemRotate 15s ease-in-out infinite;
-            transform-style: preserve-3d;
+        /* Market Item Glow Effect */
+        .market-item-glow {
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes itemRotate {
-            0%, 100% { transform: rotateX(0deg) rotateZ(0deg); }
-            25% { transform: rotateX(5deg) rotateZ(2deg); }
-            50% { transform: rotateX(0deg) rotateZ(-2deg); }
-            75% { transform: rotateX(-5deg) rotateZ(1deg); }
+        .market-item-glow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            animation: marketScan 4s ease-in-out infinite;
         }
 
-        /* Market Panel 3D Effect */
-        .market-panel-3d {
-            perspective: 1000px;
-            transform-style: preserve-3d;
+        @keyframes marketScan {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: -100%; }
+        }
+
+        /* Volume Indicator Animation */
+        .volume-indicator {
+            animation: volumePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes volumePulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
         }
     </style>
 </head>
@@ -282,9 +302,9 @@
                         </div>
                         <div>
                             <h1 class="text-xl font-bold bg-gradient-to-r from-neon-blue to-neon-green bg-clip-text text-transparent">
-                                Autonomous Trading Platform
+                                NEURAL CORE ALPHA-7 (NCA-7)
                             </h1>
-                            <p class="text-xs text-gray-400">AI-Powered Trading System</p>
+                            <p class="text-xs text-gray-400">Advanced AI Trading System</p>
                         </div>
                     </div>
                     
@@ -334,40 +354,39 @@
         <div class="flex-1 flex overflow-hidden">
             
             <!-- Sidebar -->
-            <aside class="w-64 glass border-r border-trading-border p-4 animate-slide-up">
-                <nav class="space-y-2">
+            <aside class="w-64 glass border-r border-trading-border p-3 animate-slide-up">
+                <nav class="space-y-1">
                     <template x-for="(item, index) in navigation" :key="index">
                         <a href="#" 
                            @click="activeNav = item.id"
                            :class="activeNav === item.id ? 'bg-gradient-to-r from-neon-blue/20 to-neon-purple/20 border-neon-blue text-neon-blue' : 'hover:bg-white/5 border-transparent text-gray-300 hover:text-white'"
-                           class="flex items-center space-x-3 px-4 py-3 rounded-lg border transition-all duration-200 group">
-                            <i :class="item.icon" class="text-lg group-hover:scale-110 transition-transform"></i>
+                           class="flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 group text-sm">
+                            <i :class="item.icon" class="text-sm group-hover:scale-110 transition-transform"></i>
                             <span class="font-medium" x-text="item.name"></span>
-                            <div x-show="activeNav === item.id" class="ml-auto w-2 h-2 bg-neon-blue rounded-full animate-pulse"></div>
+                            <div x-show="activeNav === item.id" class="ml-auto w-1.5 h-1.5 bg-neon-blue rounded-full animate-pulse"></div>
                         </a>
                     </template>
                 </nav>
                 
                 <!-- Global Markets Status Panel -->
-                <div class="mt-8 p-4 rounded-lg glass border border-neon-blue/20 animate-scale-in">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <i class="fas fa-globe text-neon-blue"></i>
-                        <span class="font-semibold text-neon-blue">Global Markets</span>
+                <div class="mt-4 p-3 rounded-lg glass border border-neon-blue/20 animate-scale-in">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i class="fas fa-globe text-neon-blue text-sm"></i>
+                        <span class="font-semibold text-neon-blue text-sm">Global Markets</span>
                     </div>
-                    <div class="space-y-2 text-xs">
+                    <div class="space-y-1 text-xs">
                         <template x-for="market in globalMarkets" :key="market.code">
-                            <div class="flex items-center justify-between p-2 rounded bg-white/5 hover:bg-white/10 transition-all">
-                                <div class="flex items-center space-x-2">
-                                    <div class="w-2 h-2 rounded-full" 
+                            <div class="flex items-center justify-between p-1.5 rounded bg-white/5 hover:bg-white/10 transition-all">
+                                <div class="flex items-center space-x-1.5">
+                                    <div class="w-1.5 h-1.5 rounded-full" 
                                          :class="market.isOpen ? 'bg-neon-green status-pulse' : 'bg-red-400'"></div>
-                                    <span class="font-medium" x-text="market.name"></span>
-                                    <span class="text-gray-400" x-text="market.code"></span>
+                                    <span class="font-medium text-xs" x-text="market.name"></span>
+                                    <span class="text-gray-400 text-xxs" x-text="market.code"></span>
                                 </div>
                                 <div class="text-right">
-                                    <div class="font-mono text-xs" 
+                                    <div class="font-mono text-xxs" 
                                          :class="market.permission === 'LV1' ? 'text-neon-green' : market.permission === 'No Authority' ? 'text-red-400' : 'text-yellow-400'"
                                          x-text="market.permission"></div>
-                                    <div class="text-gray-400 text-xxs" x-text="market.status"></div>
                                 </div>
                             </div>
                         </template>
@@ -375,12 +394,12 @@
                 </div>
 
                 <!-- AI Status Panel -->
-                <div class="mt-4 p-4 rounded-lg glass border border-neon-purple/20 animate-scale-in">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <i class="fas fa-brain text-neon-purple"></i>
-                        <span class="font-semibold text-neon-purple">AI Engine</span>
+                <div class="mt-3 p-3 rounded-lg glass border border-neon-purple/20 animate-scale-in">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i class="fas fa-brain text-neon-purple text-sm"></i>
+                        <span class="font-semibold text-neon-purple text-sm">AI Engine</span>
                     </div>
-                    <div class="space-y-2 text-sm">
+                    <div class="space-y-1 text-xs">
                         <div class="flex justify-between">
                             <span class="text-gray-400">Neural Networks</span>
                             <span class="text-neon-green">Active</span>
@@ -394,19 +413,19 @@
                             <span class="text-neon-blue">Monitoring</span>
                         </div>
                     </div>
-                    <div class="mt-3 h-2 bg-gray-700 rounded-full overflow-hidden">
+                    <div class="mt-2 h-1.5 bg-gray-700 rounded-full overflow-hidden">
                         <div class="h-full bg-gradient-to-r from-neon-blue to-neon-purple rounded-full animate-pulse" style="width: 87%"></div>
                     </div>
-                    <div class="text-xs text-gray-400 mt-1">AI Confidence: 87%</div>
+                    <div class="text-xxs text-gray-400 mt-1">AI Confidence: 87%</div>
                 </div>
 
                 <!-- moomoo OpenD Status -->
-                <div class="mt-4 p-4 rounded-lg glass border border-neon-orange/20 animate-scale-in">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <i class="fas fa-server text-neon-orange"></i>
-                        <span class="font-semibold text-neon-orange">moomoo OpenD</span>
+                <div class="mt-3 p-3 rounded-lg glass border border-neon-orange/20 animate-scale-in">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i class="fas fa-server text-neon-orange text-sm"></i>
+                        <span class="font-semibold text-neon-orange text-sm">moomoo OpenD</span>
                     </div>
-                    <div class="space-y-1 text-xs">
+                    <div class="space-y-1 text-xxs">
                         <div class="flex justify-between">
                             <span class="text-gray-400">Version</span>
                             <span class="text-white font-mono">9.3.5308</span>
@@ -454,12 +473,92 @@
                             </div>
                         </div>
                         <div class="p-4 h-96 chart-container">
-                            <div id="tradingChart" class="w-full h-full rounded-lg"></div>
+                            <!-- Trading Chart (default view) -->
+                            <div id="tradingChart" class="w-full h-full rounded-lg" x-show="activeNav !== 'ai-brain'"></div>
+                            
+                            <!-- AI Brain Process Content -->
+                            <div x-show="activeNav === 'ai-brain'" class="w-full h-full flex flex-col">
+                                <div class="text-center mb-6">
+                                    <div class="inline-flex items-center space-x-3 mb-4">
+                                        <div class="w-16 h-16 rounded-full bg-gradient-to-r from-neon-blue to-neon-purple flex items-center justify-center animate-pulse">
+                                            <i class="fas fa-brain text-2xl text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h2 class="text-2xl font-bold bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+                                                NEURAL CORE ALPHA-7
+                                            </h2>
+                                            <p class="text-sm text-gray-400">AI Brain Process Active</p>
+                                        </div>
+                                    </div>
+                                    <a href="ai-brain-dashboard.html" target="_blank" 
+                                       class="inline-flex items-center space-x-2 px-4 py-2 bg-neon-purple/20 border border-neon-purple/40 rounded-lg text-neon-purple hover:bg-neon-purple/30 transition-all">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>View Full AI Brain Dashboard</span>
+                                    </a>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4 flex-1">
+                                    <!-- Current Analysis -->
+                                    <div class="bg-white/5 rounded-lg p-4 border border-neon-blue/20">
+                                        <div class="flex items-center space-x-2 mb-3">
+                                            <i class="fas fa-search text-neon-blue"></i>
+                                            <span class="text-sm font-semibold text-neon-blue">CURRENT ANALYSIS</span>
+                                        </div>
+                                        <p class="text-sm text-gray-300">Processing market data across 47 timeframes. Detecting bullish divergence patterns in AAPL with 89% confidence.</p>
+                                    </div>
+                                    
+                                    <!-- Decision Engine -->
+                                    <div class="bg-white/5 rounded-lg p-4 border border-neon-green/20">
+                                        <div class="flex items-center space-x-2 mb-3">
+                                            <i class="fas fa-cogs text-neon-green"></i>
+                                            <span class="text-sm font-semibold text-neon-green">DECISION ENGINE</span>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <div class="flex justify-between">
+                                                <span class="text-xs text-gray-400">Confidence</span>
+                                                <span class="text-xs font-mono text-neon-green">87%</span>
+                                            </div>
+                                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                                <div class="bg-gradient-to-r from-neon-green to-neon-blue h-2 rounded-full" style="width: 87%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Neural Activity -->
+                                    <div class="bg-white/5 rounded-lg p-4 border border-neon-purple/20">
+                                        <div class="flex items-center space-x-2 mb-3">
+                                            <i class="fas fa-brain text-neon-purple"></i>
+                                            <span class="text-sm font-semibold text-neon-purple">NEURAL ACTIVITY</span>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <div class="text-xs text-gray-400">Active Pathways: <span class="text-neon-purple font-mono">847,293</span></div>
+                                            <div class="flex space-x-1">
+                                                <div class="flex-1 h-2 bg-neon-blue/30 rounded animate-pulse"></div>
+                                                <div class="flex-1 h-2 bg-neon-green/30 rounded animate-pulse" style="animation-delay: 0.2s"></div>
+                                                <div class="flex-1 h-2 bg-neon-purple/30 rounded animate-pulse" style="animation-delay: 0.4s"></div>
+                                                <div class="flex-1 h-2 bg-neon-pink/30 rounded animate-pulse" style="animation-delay: 0.6s"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Last Action -->
+                                    <div class="bg-white/5 rounded-lg p-4 border border-neon-orange/20">
+                                        <div class="flex items-center space-x-2 mb-3">
+                                            <i class="fas fa-bolt text-neon-orange"></i>
+                                            <span class="text-sm font-semibold text-neon-orange">LAST ACTION</span>
+                                        </div>
+                                        <div class="space-y-1">
+                                            <p class="text-sm text-gray-300">BUY 500 AAPL @ $189.47</p>
+                                            <p class="text-xs text-neon-green">+2.34% P&L</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Market Data Panel -->
-                    <div class="w-80 glass rounded-xl border border-trading-border animate-fade-in market-panel-3d">
+                    <div class="w-80 glass rounded-xl border border-trading-border animate-fade-in market-data-pulse">
                         <div class="p-4 border-b border-trading-border flex items-center justify-between">
                             <h2 class="text-lg font-bold text-neon-green">Market Data</h2>
                             <div class="flex items-center space-x-2">
@@ -467,26 +566,36 @@
                                 <span class="text-xs text-neon-green font-medium">LIVE</span>
                             </div>
                         </div>
-                        <div class="p-4 h-96 overflow-y-auto market-data-rotate">
-                            <div class="space-y-2">
+                        <div class="p-2 h-96 overflow-y-auto">
+                            <div class="space-y-1">
                                 <template x-for="(stock, index) in marketData" :key="index">
-                                    <div class="p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200 trading-table cursor-pointer market-item-rotate"
+                                    <div class="p-1.5 rounded bg-white/5 hover:bg-white/10 transition-all duration-200 trading-table cursor-pointer market-item-glow"
                                          @click="selectStock(stock.symbol)">
-                                        <div class="flex items-center justify-between mb-1">
-                                            <span class="font-bold text-white" x-text="stock.symbol"></span>
-                                            <span class="text-xs text-gray-400" x-text="stock.name"></span>
-                                        </div>
                                         <div class="flex items-center justify-between">
-                                            <span class="font-mono font-bold text-lg" x-text="formatCurrency(stock.price)"></span>
+                                            <div class="flex items-center space-x-2 flex-1">
+                                                <span class="font-bold text-white text-xs" x-text="stock.symbol"></span>
+                                                <span class="text-xxs text-gray-400 truncate" x-text="stock.name"></span>
+                                            </div>
                                             <div class="text-right">
-                                                <div class="font-mono text-sm" 
+                                                <div class="font-mono font-bold text-xs" x-text="formatCurrency(stock.price)"></div>
+                                                <div class="font-mono text-xxs" 
                                                      :class="stock.change >= 0 ? 'text-neon-green' : 'text-red-400'"
                                                      x-text="formatPriceChange(stock.change, stock.changePercent)">
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
-                                            <div class="h-full rounded-full transition-all duration-500"
+                                        <div class="flex items-center justify-between mt-1">
+                                            <div class="text-xxs text-gray-400">
+                                                <span>Vol: </span>
+                                                <span class="font-mono" x-text="formatVolume(stock.volume || Math.floor(Math.random() * 5000000) + 1000000)"></span>
+                                            </div>
+                                            <div class="text-xxs text-gray-400">
+                                                <span>Cap: </span>
+                                                <span class="font-mono" x-text="formatMarketCap(stock.marketCap || stock.price * 1000000000)"></span>
+                                            </div>
+                                        </div>
+                                        <div class="mt-1 h-0.5 bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="h-full rounded-full transition-all duration-500 volume-indicator"
                                                  :class="stock.change >= 0 ? 'bg-neon-green' : 'bg-red-400'"
                                                  :style="`width: ${Math.abs(stock.changePercent) * 10}%`">
                                             </div>
@@ -659,6 +768,7 @@
                 navigation: [
                     { id: 'trading', name: 'Trading', icon: 'fas fa-chart-line' },
                     { id: 'portfolio', name: 'Portfolio', icon: 'fas fa-briefcase' },
+                    { id: 'ai-brain', name: 'AI Brain Process', icon: 'fas fa-brain' },
                     { id: 'ai-agents', name: 'AI Agents', icon: 'fas fa-robot' },
                     { id: 'risk', name: 'Risk Management', icon: 'fas fa-shield-alt' },
                     { id: 'settings', name: 'Settings', icon: 'fas fa-cog' },
@@ -685,7 +795,21 @@
                     { symbol: 'MSFT', name: 'Microsoft Corp.', price: 334.89, change: 4.67, changePercent: 1.41 },
                     { symbol: 'TSLA', name: 'Tesla Inc.', price: 248.52, change: -8.91, changePercent: -3.46 },
                     { symbol: 'NVDA', name: 'NVIDIA Corp.', price: 456.78, change: 12.34, changePercent: 2.78 },
-                    { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 3234.56, change: 23.45, changePercent: 0.73 }
+                    { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 3234.56, change: 23.45, changePercent: 0.73 },
+                    { symbol: 'META', name: 'Meta Platforms', price: 298.45, change: -5.67, changePercent: -1.86 },
+                    { symbol: 'NFLX', name: 'Netflix Inc.', price: 445.23, change: 8.91, changePercent: 2.04 },
+                    { symbol: 'AMD', name: 'Advanced Micro Devices', price: 112.34, change: 3.45, changePercent: 3.17 },
+                    { symbol: 'INTC', name: 'Intel Corp.', price: 45.67, change: -1.23, changePercent: -2.62 },
+                    { symbol: 'CRM', name: 'Salesforce Inc.', price: 234.56, change: 6.78, changePercent: 2.98 },
+                    { symbol: 'ORCL', name: 'Oracle Corp.', price: 98.76, change: 2.34, changePercent: 2.43 },
+                    { symbol: 'ADBE', name: 'Adobe Inc.', price: 567.89, change: -12.45, changePercent: -2.15 },
+                    { symbol: 'PYPL', name: 'PayPal Holdings', price: 67.89, change: 1.23, changePercent: 1.85 },
+                    { symbol: 'UBER', name: 'Uber Technologies', price: 43.21, change: -0.89, changePercent: -2.02 },
+                    { symbol: 'SPOT', name: 'Spotify Technology', price: 156.78, change: 4.56, changePercent: 3.00 },
+                    { symbol: 'SHOP', name: 'Shopify Inc.', price: 78.90, change: 2.34, changePercent: 3.06 },
+                    { symbol: 'SQ', name: 'Block Inc.', price: 89.12, change: -1.45, changePercent: -1.60 },
+                    { symbol: 'COIN', name: 'Coinbase Global', price: 123.45, change: 5.67, changePercent: 4.81 },
+                    { symbol: 'RBLX', name: 'Roblox Corp.', price: 34.56, change: -2.34, changePercent: -6.33 }
                 ],
                 
                 // Portfolio
@@ -832,6 +956,26 @@
                         return `${changeStr} (${percentStr})`;
                     }
                     return changeStr;
+                },
+                
+                formatVolume(volume) {
+                    if (volume >= 1000000) {
+                        return (volume / 1000000).toFixed(1) + 'M';
+                    } else if (volume >= 1000) {
+                        return (volume / 1000).toFixed(1) + 'K';
+                    }
+                    return volume.toString();
+                },
+                
+                formatMarketCap(marketCap) {
+                    if (marketCap >= 1000000000000) {
+                        return '$' + (marketCap / 1000000000000).toFixed(1) + 'T';
+                    } else if (marketCap >= 1000000000) {
+                        return '$' + (marketCap / 1000000000).toFixed(1) + 'B';
+                    } else if (marketCap >= 1000000) {
+                        return '$' + (marketCap / 1000000).toFixed(1) + 'M';
+                    }
+                    return '$' + marketCap.toString();
                 },
                 
                 selectStock(symbol) {
