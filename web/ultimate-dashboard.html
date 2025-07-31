@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Autonomous Trading Platform - Ultimate Dashboard</title>
+    
+    <!-- Advanced Professional Libraries -->
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Poppins', 'Inter', 'system-ui', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'SF Mono', 'Monaco', 'monospace'],
+                    },
+                    fontSize: {
+                        'xxs': '0.5rem',
+                        'xs': '0.625rem',
+                        'sm': '0.6875rem',
+                        'base': '0.75rem',
+                        'lg': '0.8125rem',
+                        'xl': '0.875rem',
+                        '2xl': '0.9375rem',
+                        '3xl': '1rem',
+                    },
+                    colors: {
+                        'trading': {
+                            'dark': '#0a0a0a',
+                            'darker': '#050505',
+                            'panel': '#1a1a1a',
+                            'border': '#2a2a2a',
+                            'accent': '#3b82f6',
+                            'success': '#10b981',
+                            'danger': '#ef4444',
+                            'warning': '#f59e0b',
+                            'info': '#06b6d4',
+                        },
+                        'neon': {
+                            'blue': '#00d4ff',
+                            'green': '#00ff88',
+                            'purple': '#8b5cf6',
+                            'pink': '#ec4899',
+                            'orange': '#f97316',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'fade-in': 'fadeIn 0.8s ease-out',
+                        'scale-in': 'scaleIn 0.3s ease-out',
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px currentColor' },
+                            '100%': { boxShadow: '0 0 20px currentColor, 0 0 30px currentColor' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        }
+                    },
+                    backdropBlur: {
+                        'xs': '2px',
+                    },
+                    boxShadow: {
+                        'neon': '0 0 20px currentColor',
+                        'neon-lg': '0 0 40px currentColor',
+                        'trading': '0 4px 20px rgba(0, 0, 0, 0.5)',
+                        'trading-lg': '0 8px 40px rgba(0, 0, 0, 0.7)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #3b82f6, #06b6d4);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #2563eb, #0891b2);
+        }
+
+        /* Glass Effect */
+        .glass {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Neon Text Effect */
+        .neon-text {
+            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 40px currentColor;
+        }
+
+        /* Trading Grid Animation */
+        .trading-grid {
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: grid-move 20s linear infinite;
+        }
+
+        @keyframes grid-move {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 20px; }
+        }
+
+        /* Holographic Effect */
+        .holographic {
+            background: linear-gradient(45deg, 
+                rgba(59, 130, 246, 0.1) 0%,
+                rgba(16, 185, 129, 0.1) 25%,
+                rgba(139, 92, 246, 0.1) 50%,
+                rgba(236, 72, 153, 0.1) 75%,
+                rgba(59, 130, 246, 0.1) 100%);
+            background-size: 400% 400%;
+            animation: holographic 8s ease-in-out infinite;
+        }
+
+        @keyframes holographic {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Market Data Animation */
+        .price-flash {
+            animation: priceFlash 0.5s ease-in-out;
+        }
+
+        @keyframes priceFlash {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(16, 185, 129, 0.2); }
+        }
+
+        /* Chart Container Styling */
+        .chart-container {
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+        }
+
+        /* Advanced Button Styles */
+        .btn-trading {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-trading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-trading:hover::before {
+            left: 100%;
+        }
+
+        /* Status Indicator Pulse */
+        .status-pulse {
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { 
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+                transform: scale(1.1);
+            }
+        }
+
+        /* Advanced Table Styling */
+        .trading-table tr:hover {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+            transform: translateX(2px);
+            transition: all 0.2s ease;
+        }
+
+        /* News Item Hover Effect */
+        .news-item:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Loading Animation */
+        .loading-dots::after {
+            content: '';
+            animation: loadingDots 1.5s infinite;
+        }
+
+        @keyframes loadingDots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* Market Data Circular Animation */
+        .market-data-rotate {
+            animation: circularRotate 20s linear infinite;
+        }
+
+        @keyframes circularRotate {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        /* Individual Market Item Rotation */
+        .market-item-rotate {
+            animation: itemRotate 15s ease-in-out infinite;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes itemRotate {
+            0%, 100% { transform: rotateX(0deg) rotateZ(0deg); }
+            25% { transform: rotateX(5deg) rotateZ(2deg); }
+            50% { transform: rotateX(0deg) rotateZ(-2deg); }
+            75% { transform: rotateX(-5deg) rotateZ(1deg); }
+        }
+
+        /* Market Panel 3D Effect */
+        .market-panel-3d {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+    </style>
+</head>
+<body class="bg-trading-dark text-white font-sans overflow-hidden">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 trading-grid opacity-30 pointer-events-none"></div>
+    <div class="fixed inset-0 holographic opacity-20 pointer-events-none"></div>
+    
+    <!-- Main Container -->
+    <div class="h-screen flex flex-col relative z-10" x-data="tradingDashboard()">
+        
+        <!-- Header -->
+        <header class="glass border-b border-trading-border p-4 animate-fade-in">
+            <div class="flex items-center justify-between">
+                <!-- Left Section -->
+                <div class="flex items-center space-x-6">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-3">
+                        <div class="relative">
+                            <i class="fas fa-robot text-3xl text-neon-blue neon-text animate-glow"></i>
+                            <div class="absolute -top-1 -right-1 w-3 h-3 bg-neon-green rounded-full status-pulse"></div>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold bg-gradient-to-r from-neon-blue to-neon-green bg-clip-text text-transparent">
+                                Autonomous Trading Platform
+                            </h1>
+                            <p class="text-xs text-gray-400">AI-Powered Trading System</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Status Indicators -->
+                    <div class="flex items-center space-x-4 text-sm">
+                        <div class="flex items-center space-x-2 px-3 py-1 rounded-full bg-neon-green/10 border border-neon-green/20">
+                            <div class="w-2 h-2 bg-neon-green rounded-full status-pulse"></div>
+                            <span class="text-neon-green font-medium">Market Open</span>
+                        </div>
+                        <div class="flex items-center space-x-2 px-3 py-1 rounded-full bg-neon-blue/10 border border-neon-blue/20">
+                            <div class="w-2 h-2 bg-neon-blue rounded-full status-pulse"></div>
+                            <span class="text-neon-blue font-medium">API Connected</span>
+                        </div>
+                        <div class="flex items-center space-x-2 px-3 py-1 rounded-full bg-neon-purple/10 border border-neon-purple/20">
+                            <div class="w-2 h-2 bg-neon-purple rounded-full status-pulse"></div>
+                            <span class="text-neon-purple font-medium">AI Active</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Section -->
+                <div class="flex items-center space-x-6 text-sm">
+                    <div class="flex items-center space-x-4">
+                        <div class="text-center">
+                            <div class="text-gray-400">Account</div>
+                            <div class="font-mono font-bold text-neon-blue" x-text="accountId">71456526</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-gray-400">P&L</div>
+                            <div class="font-mono font-bold" :class="pnl >= 0 ? 'text-neon-green' : 'text-red-400'" x-text="formatCurrency(pnl)">+$0.00</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-gray-400">Time</div>
+                            <div class="font-mono font-bold text-white" x-text="currentTime">--:--:--</div>
+                        </div>
+                    </div>
+                    
+                    <!-- User Avatar -->
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-neon-blue to-neon-purple flex items-center justify-center">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex overflow-hidden">
+            
+            <!-- Sidebar -->
+            <aside class="w-64 glass border-r border-trading-border p-4 animate-slide-up">
+                <nav class="space-y-2">
+                    <template x-for="(item, index) in navigation" :key="index">
+                        <a href="#" 
+                           @click="activeNav = item.id"
+                           :class="activeNav === item.id ? 'bg-gradient-to-r from-neon-blue/20 to-neon-purple/20 border-neon-blue text-neon-blue' : 'hover:bg-white/5 border-transparent text-gray-300 hover:text-white'"
+                           class="flex items-center space-x-3 px-4 py-3 rounded-lg border transition-all duration-200 group">
+                            <i :class="item.icon" class="text-lg group-hover:scale-110 transition-transform"></i>
+                            <span class="font-medium" x-text="item.name"></span>
+                            <div x-show="activeNav === item.id" class="ml-auto w-2 h-2 bg-neon-blue rounded-full animate-pulse"></div>
+                        </a>
+                    </template>
+                </nav>
+                
+                <!-- Global Markets Status Panel -->
+                <div class="mt-8 p-4 rounded-lg glass border border-neon-blue/20 animate-scale-in">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <i class="fas fa-globe text-neon-blue"></i>
+                        <span class="font-semibold text-neon-blue">Global Markets</span>
+                    </div>
+                    <div class="space-y-2 text-xs">
+                        <template x-for="market in globalMarkets" :key="market.code">
+                            <div class="flex items-center justify-between p-2 rounded bg-white/5 hover:bg-white/10 transition-all">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 rounded-full" 
+                                         :class="market.isOpen ? 'bg-neon-green status-pulse' : 'bg-red-400'"></div>
+                                    <span class="font-medium" x-text="market.name"></span>
+                                    <span class="text-gray-400" x-text="market.code"></span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-mono text-xs" 
+                                         :class="market.permission === 'LV1' ? 'text-neon-green' : market.permission === 'No Authority' ? 'text-red-400' : 'text-yellow-400'"
+                                         x-text="market.permission"></div>
+                                    <div class="text-gray-400 text-xxs" x-text="market.status"></div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- AI Status Panel -->
+                <div class="mt-4 p-4 rounded-lg glass border border-neon-purple/20 animate-scale-in">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <i class="fas fa-brain text-neon-purple"></i>
+                        <span class="font-semibold text-neon-purple">AI Engine</span>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Neural Networks</span>
+                            <span class="text-neon-green">Active</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Pattern Recognition</span>
+                            <span class="text-neon-green">Learning</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Risk Analysis</span>
+                            <span class="text-neon-blue">Monitoring</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 h-2 bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-neon-blue to-neon-purple rounded-full animate-pulse" style="width: 87%"></div>
+                    </div>
+                    <div class="text-xs text-gray-400 mt-1">AI Confidence: 87%</div>
+                </div>
+
+                <!-- moomoo OpenD Status -->
+                <div class="mt-4 p-4 rounded-lg glass border border-neon-orange/20 animate-scale-in">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <i class="fas fa-server text-neon-orange"></i>
+                        <span class="font-semibold text-neon-orange">moomoo OpenD</span>
+                    </div>
+                    <div class="space-y-1 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Version</span>
+                            <span class="text-white font-mono">9.3.5308</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">API Server</span>
+                            <span class="text-neon-green font-mono">127.0.0.1:11111</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Account</span>
+                            <span class="text-neon-blue font-mono">71456526</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Quote Quota</span>
+                            <span class="text-white font-mono">300/300</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            
+            <!-- Content Area -->
+            <main class="flex-1 flex flex-col overflow-hidden">
+                
+                <!-- Top Row - Charts and Market Data -->
+                <div class="flex-1 flex p-4 space-x-4">
+                    
+                    <!-- Main Chart Panel -->
+                    <div class="flex-1 glass rounded-xl border border-trading-border animate-fade-in">
+                        <div class="p-4 border-b border-trading-border flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <h2 class="text-lg font-bold text-neon-blue">AAPL - Apple Inc.</h2>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-2xl font-mono font-bold text-neon-green" x-text="currentPrice">$189.47</span>
+                                    <span class="text-sm font-mono" :class="priceChange >= 0 ? 'text-neon-green' : 'text-red-400'" x-text="formatPriceChange(priceChange)">+2.34 (+1.25%)</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <template x-for="timeframe in timeframes" :key="timeframe">
+                                    <button @click="activeTimeframe = timeframe"
+                                            :class="activeTimeframe === timeframe ? 'bg-neon-blue text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
+                                            class="px-3 py-1 rounded text-xs font-medium transition-all duration-200 btn-trading"
+                                            x-text="timeframe">
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="p-4 h-96 chart-container">
+                            <div id="tradingChart" class="w-full h-full rounded-lg"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Market Data Panel -->
+                    <div class="w-80 glass rounded-xl border border-trading-border animate-fade-in market-panel-3d">
+                        <div class="p-4 border-b border-trading-border flex items-center justify-between">
+                            <h2 class="text-lg font-bold text-neon-green">Market Data</h2>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-neon-green rounded-full animate-pulse"></div>
+                                <span class="text-xs text-neon-green font-medium">LIVE</span>
+                            </div>
+                        </div>
+                        <div class="p-4 h-96 overflow-y-auto market-data-rotate">
+                            <div class="space-y-2">
+                                <template x-for="(stock, index) in marketData" :key="index">
+                                    <div class="p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200 trading-table cursor-pointer market-item-rotate"
+                                         @click="selectStock(stock.symbol)">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <span class="font-bold text-white" x-text="stock.symbol"></span>
+                                            <span class="text-xs text-gray-400" x-text="stock.name"></span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-mono font-bold text-lg" x-text="formatCurrency(stock.price)"></span>
+                                            <div class="text-right">
+                                                <div class="font-mono text-sm" 
+                                                     :class="stock.change >= 0 ? 'text-neon-green' : 'text-red-400'"
+                                                     x-text="formatPriceChange(stock.change, stock.changePercent)">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="h-full rounded-full transition-all duration-500"
+                                                 :class="stock.change >= 0 ? 'bg-neon-green' : 'bg-red-400'"
+                                                 :style="`width: ${Math.abs(stock.changePercent) * 10}%`">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bottom Row - Order Entry, Portfolio, News -->
+                <div class="h-80 flex p-4 pt-0 space-x-4">
+                    
+                    <!-- Order Entry Panel -->
+                    <div class="flex-1 glass rounded-xl border border-trading-border animate-slide-up">
+                        <div class="p-4 border-b border-trading-border flex items-center justify-between">
+                            <h2 class="text-lg font-bold text-neon-orange">Order Entry</h2>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-robot text-neon-purple"></i>
+                                <span class="text-xs text-neon-purple font-medium">AI Enabled</span>
+                            </div>
+                        </div>
+                        <div class="p-4 h-64 overflow-y-auto">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-400 mb-1">Symbol</label>
+                                    <input type="text" x-model="orderForm.symbol" 
+                                           class="w-full px-3 py-2 bg-white/5 border border-gray-600 rounded-lg text-white font-mono focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-400 mb-1">Order Type</label>
+                                    <select x-model="orderForm.type" 
+                                            class="w-full px-3 py-2 bg-white/5 border border-gray-600 rounded-lg text-white focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all">
+                                        <option value="market">Market</option>
+                                        <option value="limit">Limit</option>
+                                        <option value="stop">Stop</option>
+                                        <option value="stop-limit">Stop Limit</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-400 mb-1">Quantity</label>
+                                    <input type="number" x-model="orderForm.quantity" 
+                                           class="w-full px-3 py-2 bg-white/5 border border-gray-600 rounded-lg text-white font-mono focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-400 mb-1">Price</label>
+                                    <input type="number" x-model="orderForm.price" step="0.01"
+                                           class="w-full px-3 py-2 bg-white/5 border border-gray-600 rounded-lg text-white font-mono focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all">
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 p-3 rounded-lg bg-gradient-to-r from-neon-blue/10 to-neon-purple/10 border border-neon-blue/20">
+                                <div class="text-xs text-gray-400 mb-1">Estimated Value</div>
+                                <div class="font-mono font-bold text-lg text-white" x-text="formatCurrency(orderForm.quantity * orderForm.price)"></div>
+                            </div>
+                            
+                            <div class="flex space-x-2 mt-4">
+                                <button @click="submitOrder('buy')" 
+                                        class="flex-1 bg-gradient-to-r from-neon-green to-green-500 hover:from-green-500 hover:to-neon-green text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 btn-trading flex items-center justify-center space-x-2">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>BUY</span>
+                                </button>
+                                <button @click="submitOrder('sell')" 
+                                        class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-500 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 btn-trading flex items-center justify-center space-x-2">
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span>SELL</span>
+                                </button>
+                            </div>
+                            
+                            <!-- AI Recommendation -->
+                            <div class="mt-4 p-3 rounded-lg bg-gradient-to-r from-neon-purple/10 to-neon-pink/10 border border-neon-purple/20">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <i class="fas fa-brain text-neon-purple"></i>
+                                    <span class="text-xs font-medium text-neon-purple">AI Recommendation</span>
+                                </div>
+                                <p class="text-xs text-gray-300" x-text="aiRecommendation"></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Portfolio Panel -->
+                    <div class="flex-1 glass rounded-xl border border-trading-border animate-slide-up">
+                        <div class="p-4 border-b border-trading-border flex items-center justify-between">
+                            <h2 class="text-lg font-bold text-neon-green">Portfolio</h2>
+                            <div class="text-right">
+                                <div class="text-xs text-gray-400">Total Value</div>
+                                <div class="font-mono font-bold text-lg text-neon-green" x-text="formatCurrency(portfolioValue)"></div>
+                            </div>
+                        </div>
+                        <div class="p-4 h-64 overflow-y-auto">
+                            <div class="space-y-2">
+                                <template x-for="(position, index) in portfolio" :key="index">
+                                    <div class="p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200 trading-table">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <span class="font-bold text-white" x-text="position.symbol"></span>
+                                            <span class="font-mono text-sm text-gray-400" x-text="position.quantity + ' shares'"></span>
+                                        </div>
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div>
+                                                <div class="text-xs text-gray-400">Avg Cost</div>
+                                                <div class="font-mono text-sm" x-text="formatCurrency(position.avgCost)"></div>
+                                            </div>
+                                            <div class="text-right">
+                                                <div class="text-xs text-gray-400">Market Value</div>
+                                                <div class="font-mono text-sm" x-text="formatCurrency(position.marketValue)"></div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <div class="font-mono text-sm" 
+                                                 :class="position.pnl >= 0 ? 'text-neon-green' : 'text-red-400'"
+                                                 x-text="formatCurrency(position.pnl)">
+                                            </div>
+                                            <div class="text-xs" 
+                                                 :class="position.pnl >= 0 ? 'text-neon-green' : 'text-red-400'"
+                                                 x-text="((position.pnl / (position.avgCost * position.quantity)) * 100).toFixed(2) + '%'">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- News Panel -->
+                    <div class="flex-1 glass rounded-xl border border-trading-border animate-slide-up">
+                        <div class="p-4 border-b border-trading-border flex items-center justify-between">
+                            <h2 class="text-lg font-bold text-neon-orange">Market News</h2>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-rss text-neon-orange animate-pulse"></i>
+                                <span class="text-xs text-neon-orange font-medium">Live Feed</span>
+                            </div>
+                        </div>
+                        <div class="p-4 h-64 overflow-y-auto">
+                            <div class="space-y-3">
+                                <template x-for="(news, index) in newsItems" :key="index">
+                                    <div class="p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200 news-item cursor-pointer">
+                                        <div class="flex items-start justify-between mb-2">
+                                            <div class="text-xs text-gray-400" x-text="news.time"></div>
+                                            <div class="text-xs px-2 py-1 rounded-full" 
+                                                 :class="news.impact === 'high' ? 'bg-red-500/20 text-red-400' : news.impact === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-green-500/20 text-green-400'"
+                                                 x-text="news.impact.toUpperCase()">
+                                            </div>
+                                        </div>
+                                        <h4 class="text-sm font-medium text-white mb-1" x-text="news.title"></h4>
+                                        <p class="text-xs text-gray-400 line-clamp-2" x-text="news.summary"></p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function tradingDashboard() {
+            return {
+                // Data Properties
+                accountId: '71456526',
+                currentTime: '--:--:--',
+                pnl: 0,
+                currentPrice: 189.47,
+                priceChange: 2.34,
+                activeNav: 'trading',
+                activeTimeframe: '1D',
+                
+                // Navigation
+                navigation: [
+                    { id: 'trading', name: 'Trading', icon: 'fas fa-chart-line' },
+                    { id: 'portfolio', name: 'Portfolio', icon: 'fas fa-briefcase' },
+                    { id: 'ai-agents', name: 'AI Agents', icon: 'fas fa-robot' },
+                    { id: 'risk', name: 'Risk Management', icon: 'fas fa-shield-alt' },
+                    { id: 'settings', name: 'Settings', icon: 'fas fa-cog' },
+                    { id: 'history', name: 'Trade History', icon: 'fas fa-history' },
+                    { id: 'analytics', name: 'Analytics', icon: 'fas fa-chart-bar' },
+                    { id: 'news', name: 'News', icon: 'fas fa-newspaper' }
+                ],
+                
+                // Timeframes
+                timeframes: ['1M', '5M', '15M', '1H', '1D', '1W'],
+                
+                // Order Form
+                orderForm: {
+                    symbol: 'AAPL',
+                    type: 'market',
+                    quantity: 100,
+                    price: 189.47
+                },
+                
+                // Market Data
+                marketData: [
+                    { symbol: 'AAPL', name: 'Apple Inc.', price: 189.47, change: 2.34, changePercent: 1.25 },
+                    { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 2847.63, change: -15.42, changePercent: -0.54 },
+                    { symbol: 'MSFT', name: 'Microsoft Corp.', price: 334.89, change: 4.67, changePercent: 1.41 },
+                    { symbol: 'TSLA', name: 'Tesla Inc.', price: 248.52, change: -8.91, changePercent: -3.46 },
+                    { symbol: 'NVDA', name: 'NVIDIA Corp.', price: 456.78, change: 12.34, changePercent: 2.78 },
+                    { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 3234.56, change: 23.45, changePercent: 0.73 }
+                ],
+                
+                // Portfolio
+                portfolio: [
+                    { symbol: 'AAPL', quantity: 500, avgCost: 185.20, marketValue: 94735.00, pnl: 2135.00 },
+                    { symbol: 'MSFT', quantity: 200, avgCost: 330.45, marketValue: 66978.00, pnl: 888.00 },
+                    { symbol: 'GOOGL', quantity: 25, avgCost: 2850.00, marketValue: 71190.75, pnl: -58.75 }
+                ],
+                
+                // News Items
+                newsItems: [
+                    {
+                        time: '2 minutes ago',
+                        title: 'Apple Reports Strong Q3 Earnings, Beats Expectations',
+                        summary: 'Apple Inc. reported quarterly earnings that exceeded analyst expectations, driven by strong iPhone sales and services revenue growth.',
+                        impact: 'high'
+                    },
+                    {
+                        time: '5 minutes ago',
+                        title: 'Fed Signals Potential Rate Cut in September Meeting',
+                        summary: 'Federal Reserve officials hint at possible interest rate reduction following recent economic data showing cooling inflation.',
+                        impact: 'high'
+                    },
+                    {
+                        time: '8 minutes ago',
+                        title: 'Tesla Announces New Gigafactory in Southeast Asia',
+                        summary: 'Tesla reveals plans for a new manufacturing facility to meet growing demand in the Asian market.',
+                        impact: 'medium'
+                    },
+                    {
+                        time: '12 minutes ago',
+                        title: 'Microsoft Azure Revenue Grows 40% Year-over-Year',
+                        summary: 'Cloud computing division continues strong performance with enterprise customers driving adoption.',
+                        impact: 'medium'
+                    },
+                    {
+                        time: '15 minutes ago',
+                        title: 'NVIDIA Stock Surges on AI Chip Demand Forecast',
+                        summary: 'Semiconductor giant sees continued strong demand for AI processing units from tech companies.',
+                        impact: 'low'
+                    }
+                ],
+                
+                // Global Markets Data (based on moomoo OpenD permissions)
+                globalMarkets: [
+                    { 
+                        code: 'HKEX', 
+                        name: 'Hong Kong', 
+                        permission: 'LV1', 
+                        isOpen: true, 
+                        status: 'Open 09:30-16:00 HKT',
+                        timezone: 'Asia/Hong_Kong'
+                    },
+                    { 
+                        code: 'HKOPT', 
+                        name: 'HK Options', 
+                        permission: 'LV1', 
+                        isOpen: true, 
+                        status: 'Open 09:15-16:30 HKT',
+                        timezone: 'Asia/Hong_Kong'
+                    },
+                    { 
+                        code: 'HKFUT', 
+                        name: 'HK Futures', 
+                        permission: 'LV1', 
+                        isOpen: true, 
+                        status: 'Open 09:15-17:00 HKT',
+                        timezone: 'Asia/Hong_Kong'
+                    },
+                    { 
+                        code: 'NYSE', 
+                        name: 'US Stocks', 
+                        permission: 'No Authority', 
+                        isOpen: false, 
+                        status: 'Closed - No Access',
+                        timezone: 'America/New_York'
+                    },
+                    { 
+                        code: 'USOPT', 
+                        name: 'US Options', 
+                        permission: 'LV1', 
+                        isOpen: false, 
+                        status: 'Closed 09:30-16:00 EST',
+                        timezone: 'America/New_York'
+                    },
+                    { 
+                        code: 'CME', 
+                        name: 'CME Futures', 
+                        permission: 'No Authority', 
+                        isOpen: false, 
+                        status: 'Closed - No Access',
+                        timezone: 'America/Chicago'
+                    },
+                    { 
+                        code: 'SSE', 
+                        name: 'Shanghai', 
+                        permission: 'No Authority', 
+                        isOpen: false, 
+                        status: 'Closed - No Access',
+                        timezone: 'Asia/Shanghai'
+                    },
+                    { 
+                        code: 'SZSE', 
+                        name: 'Shenzhen', 
+                        permission: 'No Authority', 
+                        isOpen: false, 
+                        status: 'Closed - No Access',
+                        timezone: 'Asia/Shanghai'
+                    }
+                ],
+                
+                // AI Recommendation
+                aiRecommendation: 'Strong BUY signal detected for AAPL. Technical indicators show bullish momentum with 87% confidence. RSI at 65, MACD bullish crossover confirmed.',
+                
+                // Computed Properties
+                get portfolioValue() {
+                    return this.portfolio.reduce((total, position) => total + position.marketValue, 0);
+                },
+                
+                // Methods
+                init() {
+                    this.updateTime();
+                    this.initChart();
+                    this.startRealTimeUpdates();
+                },
+                
+                updateTime() {
+                    const now = new Date();
+                    this.currentTime = now.toLocaleTimeString();
+                },
+                
+                formatCurrency(amount) {
+                    return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 2
+                    }).format(amount);
+                },
+                
+                formatPriceChange(change, percent = null) {
+                    const changeStr = change >= 0 ? `+${change.toFixed(2)}` : change.toFixed(2);
+                    if (percent !== null) {
+                        const percentStr = percent >= 0 ? `+${percent.toFixed(2)}%` : `${percent.toFixed(2)}%`;
+                        return `${changeStr} (${percentStr})`;
+                    }
+                    return changeStr;
+                },
+                
+                selectStock(symbol) {
+                    this.orderForm.symbol = symbol;
+                    const stock = this.marketData.find(s => s.symbol === symbol);
+                    if (stock) {
+                        this.orderForm.price = stock.price;
+                        this.currentPrice = stock.price;
+                        this.priceChange = stock.change;
+                    }
+                },
+                
+                submitOrder(side) {
+                    const orderValue = this.orderForm.quantity * this.orderForm.price;
+                    const message = `🚀 AI-Powered ${side.toUpperCase()} Order Submitted!\n\n` +
+                                  `Symbol: ${this.orderForm.symbol}\n` +
+                                  `Quantity: ${this.orderForm.quantity}\n` +
+                                  `Price: ${this.formatCurrency(this.orderForm.price)}\n` +
+                                  `Total Value: ${this.formatCurrency(orderValue)}\n\n` +
+                                  `The autonomous trading system will execute this order with optimal timing and smart routing.`;
+                    alert(message);
+                },
+                
+                initChart() {
+                    // Initialize TradingView Lightweight Charts
+                    const chartContainer = document.getElementById('tradingChart');
+                    if (!chartContainer) return;
+                    
+                    const chart = LightweightCharts.createChart(chartContainer, {
+                        width: chartContainer.clientWidth,
+                        height: chartContainer.clientHeight,
+                        layout: {
+                            background: { color: 'transparent' },
+                            textColor: '#d1d5db',
+                        },
+                        grid: {
+                            vertLines: { color: 'rgba(59, 130, 246, 0.1)' },
+                            horzLines: { color: 'rgba(59, 130, 246, 0.1)' },
+                        },
+                        crosshair: {
+                            mode: LightweightCharts.CrosshairMode.Normal,
+                        },
+                        rightPriceScale: {
+                            borderColor: 'rgba(59, 130, 246, 0.3)',
+                        },
+                        timeScale: {
+                            borderColor: 'rgba(59, 130, 246, 0.3)',
+                            timeVisible: true,
+                            secondsVisible: false,
+                        },
+                    });
+
+                    // Add candlestick series
+                    const candlestickSeries = chart.addCandlestickSeries({
+                        upColor: '#00ff88',
+                        downColor: '#ef4444',
+                        borderDownColor: '#ef4444',
+                        borderUpColor: '#00ff88',
+                        wickDownColor: '#ef4444',
+                        wickUpColor: '#00ff88',
+                    });
+
+                    // Generate realistic OHLC data
+                    const data = this.generateOHLCData();
+                    candlestickSeries.setData(data);
+
+                    // Add volume series
+                    const volumeSeries = chart.addHistogramSeries({
+                        color: 'rgba(59, 130, 246, 0.5)',
+                        priceFormat: {
+                            type: 'volume',
+                        },
+                        priceScaleId: '',
+                        scaleMargins: {
+                            top: 0.8,
+                            bottom: 0,
+                        },
+                    });
+
+                    const volumeData = this.generateVolumeData();
+                    volumeSeries.setData(volumeData);
+
+                    // Store chart reference for updates
+                    this.chart = chart;
+                    this.candlestickSeries = candlestickSeries;
+                    this.volumeSeries = volumeSeries;
+
+                    // Handle resize
+                    window.addEventListener('resize', () => {
+                        chart.applyOptions({
+                            width: chartContainer.clientWidth,
+                            height: chartContainer.clientHeight,
+                        });
+                    });
+                },
+                
+                generateOHLCData() {
+                    const data = [];
+                    let basePrice = 189.47;
+                    const now = new Date();
+                    
+                    for (let i = 100; i >= 0; i--) {
+                        const time = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                        const open = basePrice + (Math.random() - 0.5) * 8;
+                        const volatility = Math.random() * 6;
+                        const high = open + Math.random() * volatility;
+                        const low = open - Math.random() * volatility;
+                        const close = low + Math.random() * (high - low);
+                        
+                        data.push({
+                            time: Math.floor(time.getTime() / 1000),
+                            open: parseFloat(open.toFixed(2)),
+                            high: parseFloat(high.toFixed(2)),
+                            low: parseFloat(low.toFixed(2)),
+                            close: parseFloat(close.toFixed(2)),
+                        });
+                        
+                        basePrice = close;
+                    }
+                    
+                    return data;
+                },
+                
+                generateVolumeData() {
+                    const data = [];
+                    const now = new Date();
+                    
+                    for (let i = 100; i >= 0; i--) {
+                        const time = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                        const volume = Math.floor(Math.random() * 2000000) + 500000;
+                        
+                        data.push({
+                            time: Math.floor(time.getTime() / 1000),
+                            value: volume,
+                        });
+                    }
+                    
+                    return data;
+                },
+                
+                startRealTimeUpdates() {
+                    // Update time every second
+                    setInterval(() => {
+                        this.updateTime();
+                    }, 1000);
+                    
+                    // Update P&L every 3 seconds
+                    setInterval(() => {
+                        this.pnl = (Math.random() - 0.3) * 2000;
+                    }, 3000);
+                    
+                    // Update market data every 2 seconds
+                    setInterval(() => {
+                        this.marketData.forEach(stock => {
+                            const change = (Math.random() - 0.5) * 4;
+                            stock.price += change;
+                            stock.change += change;
+                            stock.changePercent = (stock.change / (stock.price - stock.change)) * 100;
+                            
+                            // Update current price if it's the selected stock
+                            if (stock.symbol === this.orderForm.symbol) {
+                                this.currentPrice = stock.price;
+                                this.priceChange = stock.change;
+                                this.orderForm.price = stock.price;
+                            }
+                        });
+                        
+                        // Update portfolio values
+                        this.portfolio.forEach(position => {
+                            const stock = this.marketData.find(s => s.symbol === position.symbol);
+                            if (stock) {
+                                position.marketValue = position.quantity * stock.price;
+                                position.pnl = position.marketValue - (position.quantity * position.avgCost);
+                            }
+                        });
+                    }, 2000);
+                    
+                    // Add new news items every 30 seconds
+                    setInterval(() => {
+                        this.addNewsItem();
+                    }, 30000);
+                },
+                
+                addNewsItem() {
+                    const newsTemplates = [
+                        'Breaking: Major tech earnings surprise analysts',
+                        'Federal Reserve announces policy changes',
+                        'Cryptocurrency market shows volatility',
+                        'Energy sector gains on supply concerns',
+                        'Healthcare stocks rally on breakthrough news',
+                        'Banking sector faces regulatory updates'
+                    ];
+                    
+                    const impacts = ['high', 'medium', 'low'];
+                    const randomNews = newsTemplates[Math.floor(Math.random() * newsTemplates.length)];
+                    const randomImpact = impacts[Math.floor(Math.random() * impacts.length)];
+                    
+                    this.newsItems.unshift({
+                        time: 'Just now',
+                        title: randomNews,
+                        summary: 'Market participants are closely monitoring developments as this could impact trading sentiment and volatility.',
+                        impact: randomImpact
+                    });
+                    
+                    // Keep only the latest 10 news items
+                    if (this.newsItems.length > 10) {
+                        this.newsItems = this.newsItems.slice(0, 10);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

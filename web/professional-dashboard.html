@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Autonomous Trading Platform - Professional Dashboard</title>
+    
+    <!-- Professional Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Professional Trading Interface */
+        .trading-container {
+            display: grid;
+            grid-template-areas: 
+                "header header header header"
+                "sidebar main-chart market-data"
+                "sidebar order-panel portfolio"
+                "news news news";
+            grid-template-columns: 280px 1fr 320px;
+            grid-template-rows: 60px 1fr 300px 200px;
+            height: 100vh;
+            gap: 1px;
+            background: #1a1a1a;
+        }
+
+        .panel {
+            background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+            border: 1px solid #333;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: linear-gradient(90deg, #2d3748, #4a5568);
+            padding: 8px 16px;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header-panel {
+            grid-area: header;
+            background: linear-gradient(90deg, #1a202c, #2d3748);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 2px solid #4a5568;
+        }
+
+        .sidebar {
+            grid-area: sidebar;
+            background: linear-gradient(180deg, #1a1a1a, #2a2a2a);
+            border-right: 1px solid #333;
+        }
+
+        .main-chart {
+            grid-area: main-chart;
+            position: relative;
+        }
+
+        .market-data {
+            grid-area: market-data;
+            border-left: 1px solid #333;
+        }
+
+        .order-panel {
+            grid-area: order-panel;
+            border-left: 1px solid #333;
+            border-top: 1px solid #333;
+        }
+
+        .portfolio {
+            grid-area: portfolio;
+            border-top: 1px solid #333;
+        }
+
+        .news {
+            grid-area: news;
+            border-top: 1px solid #333;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            height: calc(100% - 40px);
+            position: relative;
+            background: #0f0f0f;
+            padding: 20px;
+        }
+
+        /* Market Data Table */
+        .market-table {
+            height: calc(100% - 40px);
+            overflow-y: auto;
+        }
+
+        .market-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .market-table th {
+            background: #2d3748;
+            padding: 8px 6px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #444;
+            position: sticky;
+            top: 0;
+        }
+
+        .market-table td {
+            padding: 6px;
+            border-bottom: 1px solid #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .price-up { color: #10b981; }
+        .price-down { color: #ef4444; }
+        .price-neutral { color: #6b7280; }
+
+        /* Order Entry */
+        .order-form {
+            padding: 16px;
+            height: calc(100% - 40px);
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #9ca3af;
+            text-transform: uppercase;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            background: #374151;
+            border: 1px solid #4b5563;
+            border-radius: 4px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: 100%;
+            margin: 4px 0;
+        }
+
+        .btn-buy {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .btn-sell {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Portfolio Table */
+        .portfolio-table {
+            height: calc(100% - 40px);
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .portfolio-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .portfolio-table th {
+            background: #2d3748;
+            padding: 8px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #444;
+        }
+
+        .portfolio-table td {
+            padding: 8px;
+            border-bottom: 1px solid #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* News Feed */
+        .news-feed {
+            height: calc(100% - 40px);
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .news-item {
+            padding: 12px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .news-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .news-time {
+            font-size: 10px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .news-title {
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        /* Sidebar Navigation */
+        .nav-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .nav-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid #3b82f6;
+        }
+
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* Status Indicators */
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-online { background: #10b981; }
+        .status-offline { background: #ef4444; }
+        .status-warning { background: #f59e0b; }
+
+        /* Real-time Data Animation */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .live-data {
+            animation: pulse 2s infinite;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+
+        /* Utility Classes */
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .gap-2 { gap: 8px; }
+        .gap-4 { gap: 16px; }
+        .text-lg { font-size: 18px; }
+        .text-sm { font-size: 14px; }
+        .text-xs { font-size: 12px; }
+        .font-bold { font-weight: 700; }
+        .font-mono { font-family: 'Courier New', monospace; }
+        .text-blue-400 { color: #60a5fa; }
+        .text-green-400 { color: #4ade80; }
+        .text-red-400 { color: #f87171; }
+        .text-gray-400 { color: #9ca3af; }
+        .ml-auto { margin-left: auto; }
+        .mt-4 { margin-top: 16px; }
+        .mb-2 { margin-bottom: 8px; }
+        .p-3 { padding: 12px; }
+        .rounded { border-radius: 6px; }
+        .bg-blue-900 { background-color: rgba(30, 58, 138, 0.3); }
+        .text-blue-300 { color: #93c5fd; }
+
+        /* Grid Layouts */
+        .grid-2 { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 8px; 
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .trading-container {
+                grid-template-columns: 250px 1fr 280px;
+            }
+        }
+
+        /* Advanced Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="trading-container">
+        <!-- Header Panel -->
+        <div class="header-panel">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-robot text-blue-400 text-lg"></i>
+                    <h1 class="text-lg font-bold">Autonomous Trading Platform</h1>
+                </div>
+                <div class="flex items-center gap-4 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="status-indicator status-online"></span>
+                        <span>Market Open</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="status-indicator status-online"></span>
+                        <span>API Connected</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="status-indicator status-online"></span>
+                        <span>AI Active</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 text-sm">
+                <div>
+                    <span class="text-gray-400">Account:</span>
+                    <span class="font-mono">71456526</span>
+                </div>
+                <div>
+                    <span class="text-gray-400">P&L:</span>
+                    <span class="font-mono text-green-400" id="headerPnL">+$0.00</span>
+                </div>
+                <div>
+                    <span class="text-gray-400">Time:</span>
+                    <span class="font-mono" id="currentTime">--:--:--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="panel-header">
+                <span>Navigation</span>
+            </div>
+            <div class="nav-item active">
+                <i class="fas fa-chart-line"></i>
+                <span>Trading</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-briefcase"></i>
+                <span>Portfolio</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-robot"></i>
+                <span>AI Agents</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Risk Management</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-history"></i>
+                <span>Trade History</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Analytics</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-newspaper"></i>
+                <span>News</span>
+            </div>
+        </div>
+
+        <!-- Main Chart Panel -->
+        <div class="main-chart panel">
+            <div class="panel-header">
+                <span>AAPL - Apple Inc. | 1D</span>
+                <div class="flex items-center gap-2">
+                    <button class="text-xs" style="padding: 4px 8px; background: #3b82f6; border: none; border-radius: 3px; color: white;">1M</button>
+                    <button class="text-xs" style="padding: 4px 8px; background: #6b7280; border: none; border-radius: 3px; color: white;">5M</button>
+                    <button class="text-xs" style="padding: 4px 8px; background: #6b7280; border: none; border-radius: 3px; color: white;">15M</button>
+                    <button class="text-xs" style="padding: 4px 8px; background: #6b7280; border: none; border-radius: 3px; color: white;">1H</button>
+                    <button class="text-xs" style="padding: 4px 8px; background: #6b7280; border: none; border-radius: 3px; color: white;">1D</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="mainChart" style="width: 100%; height: 100%;"></canvas>
+            </div>
+        </div>
+
+        <!-- Market Data Panel -->
+        <div class="market-data panel">
+            <div class="panel-header">
+                <span>Market Data</span>
+                <span class="text-green-400 live-data">● LIVE</span>
+            </div>
+            <div class="market-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Price</th>
+                            <th>Change</th>
+                            <th>%</th>
+                        </tr>
+                    </thead>
+                    <tbody id="marketDataTable">
+                        <tr>
+                            <td>AAPL</td>
+                            <td class="font-mono">$189.47</td>
+                            <td class="font-mono price-up">+2.34</td>
+                            <td class="font-mono price-up">+1.25%</td>
+                        </tr>
+                        <tr>
+                            <td>GOOGL</td>
+                            <td class="font-mono">$2,847.63</td>
+                            <td class="font-mono price-down">-15.42</td>
+                            <td class="font-mono price-down">-0.54%</td>
+                        </tr>
+                        <tr>
+                            <td>MSFT</td>
+                            <td class="font-mono">$334.89</td>
+                            <td class="font-mono price-up">+4.67</td>
+                            <td class="font-mono price-up">+1.41%</td>
+                        </tr>
+                        <tr>
+                            <td>TSLA</td>
+                            <td class="font-mono">$248.52</td>
+                            <td class="font-mono price-down">-8.91</td>
+                            <td class="font-mono price-down">-3.46%</td>
+                        </tr>
+                        <tr>
+                            <td>NVDA</td>
+                            <td class="font-mono">$456.78</td>
+                            <td class="font-mono price-up">+12.34</td>
+                            <td class="font-mono price-up">+2.78%</td>
+                        </tr>
+                        <tr>
+                            <td>AMZN</td>
+                            <td class="font-mono">$3,234.56</td>
+                            <td class="font-mono price-up">+23.45</td>
+                            <td class="font-mono price-up">+0.73%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Order Entry Panel -->
+        <div class="order-panel panel">
+            <div class="panel-header">
+                <span>Order Entry</span>
+                <span>
+                    <i class="fas fa-robot text-blue-400"></i>
+                    AI Enabled
+                </span>
+            </div>
+            <div class="order-form">
+                <div class="form-group">
+                    <label>Symbol</label>
+                    <input type="text" class="form-control" value="AAPL" placeholder="Enter symbol">
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Order Type</label>
+                        <select class="form-control">
+                            <option>Market</option>
+                            <option>Limit</option>
+                            <option>Stop</option>
+                            <option>Stop Limit</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Time in Force</label>
+                        <select class="form-control">
+                            <option>DAY</option>
+                            <option>GTC</option>
+                            <option>IOC</option>
+                            <option>FOK</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" class="form-control" value="100" placeholder="Shares" id="quantityInput">
+                    </div>
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input type="number" class="form-control" value="189.47" placeholder="Price" id="priceInput">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Estimated Value</label>
+                    <input type="text" class="form-control" value="$18,947.00" readonly id="estimatedValue">
+                </div>
+                <div class="mt-4">
+                    <button class="btn btn-buy" id="buyBtn">
+                        <i class="fas fa-arrow-up"></i>
+                        BUY
+                    </button>
+                    <button class="btn btn-sell" id="sellBtn">
+                        <i class="fas fa-arrow-down"></i>
+                        SELL
+                    </button>
+                </div>
+                <div class="mt-4 p-3 bg-blue-900 rounded">
+                    <div class="text-xs text-blue-300 mb-2">
+                        <i class="fas fa-robot"></i>
+                        AI Recommendation
+                    </div>
+                    <div class="text-sm">
+                        Strong BUY signal detected. Technical indicators show bullish momentum with 87% confidence.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Panel -->
+        <div class="portfolio panel">
+            <div class="panel-header">
+                <span>Portfolio</span>
+                <span class="text-green-400">$125,847.32</span>
+            </div>
+            <div class="portfolio-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Qty</th>
+                            <th>Avg Cost</th>
+                            <th>Market Value</th>
+                            <th>P&L</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>AAPL</td>
+                            <td class="font-mono">500</td>
+                            <td class="font-mono">$185.20</td>
+                            <td class="font-mono">$94,735.00</td>
+                            <td class="font-mono price-up">+$2,135.00</td>
+                        </tr>
+                        <tr>
+                            <td>MSFT</td>
+                            <td class="font-mono">200</td>
+                            <td class="font-mono">$330.45</td>
+                            <td class="font-mono">$66,978.00</td>
+                            <td class="font-mono price-up">+$888.00</td>
+                        </tr>
+                        <tr>
+                            <td>GOOGL</td>
+                            <td class="font-mono">25</td>
+                            <td class="font-mono">$2,850.00</td>
+                            <td class="font-mono">$71,190.75</td>
+                            <td class="font-mono price-down">-$58.75</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- News Feed Panel -->
+        <div class="news panel">
+            <div class="panel-header">
+                <span>Market News</span>
+                <span>
+                    <i class="fas fa-rss" style="color: #f59e0b;"></i>
+                    Live Feed
+                </span>
+            </div>
+            <div class="news-feed" id="newsFeed">
+                <div class="news-item fade-in">
+                    <div class="news-time">2 minutes ago</div>
+                    <div class="news-title">Apple Reports Strong Q3 Earnings, Beats Expectations</div>
+                </div>
+                <div class="news-item fade-in">
+                    <div class="news-time">5 minutes ago</div>
+                    <div class="news-title">Fed Signals Potential Rate Cut in September Meeting</div>
+                </div>
+                <div class="news-item fade-in">
+                    <div class="news-time">8 minutes ago</div>
+                    <div class="news-title">Tesla Announces New Gigafactory in Southeast Asia</div>
+                </div>
+                <div class="news-item fade-in">
+                    <div class="news-time">12 minutes ago</div>
+                    <div class="news-title">Microsoft Azure Revenue Grows 40% Year-over-Year</div>
+                </div>
+                <div class="news-item fade-in">
+                    <div class="news-time">15 minutes ago</div>
+                    <div class="news-title">NVIDIA Stock Surges on AI Chip Demand Forecast</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Chart
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        
+        // Generate realistic stock data
+        function generateStockData() {
+            const data = [];
+            const labels = [];
+            let price = 189.47;
+            
+            for (let i = 30; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString());
+                
+                // Simulate price movement
+                const change = (Math.random() - 0.5) * 10;
+                price += change;
+                data.push(price.toFixed(2));
+            }
+            
+            return { labels, data };
+        }
+
+        const stockData = generateStockData();
+
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: stockData.labels,
+                datasets: [{
+                    label: 'AAPL Price',
+                    data: stockData.data,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: '#374151'
+                        },
+                        ticks: {
+                            color: '#9ca3af'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: '#374151'
+                        },
+                        ticks: {
+                            color: '#9ca3af'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Real-time updates
+        function updateMarketData() {
+            const symbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA', 'AMZN'];
+            const tableBody = document.getElementById('marketDataTable');
+            
+            symbols.forEach((symbol, index) => {
+                const row = tableBody.rows[index];
+                if (row) {
+                    const priceCell = row.cells[1];
+                    const changeCell = row.cells[2];
+                    const percentCell = row.cells[3];
+                    
+                    // Simulate price changes
+                    const currentPrice = parseFloat(priceCell.textContent.replace('$', ''));
+                    const change = (Math.random() - 0.5) * 2;
+                    const newPrice = currentPrice + change;
+                    const percentChange = (change / currentPrice) * 100;
+                    
+                    priceCell.textContent = `$${newPrice.toFixed(2)}`;
+                    changeCell.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}`;
+                    percentCell.textContent = `${percentChange >= 0 ? '+' : ''}${percentChange.toFixed(2)}%`;
+                    
+                    // Update colors
+                    const colorClass = change >= 0 ? 'price-up' : 'price-down';
+                    changeCell.className = `font-mono ${colorClass}`;
+                    percentCell.className = `font-mono ${colorClass}`;
+                }
+            });
+        }
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString();
+        }
+
+        // Update P&L
+        function updatePnL() {
+            const pnl = (Math.random() - 0.4) * 1000;
+            const pnlElement = document.getElementById('headerPnL');
+            pnlElement.textContent = `${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}`;
+            pnlElement.className = `font-mono ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`;
+        }
+
+        // Order form calculations
+        function updateEstimatedValue() {
+            const quantity = parseFloat(document.getElementById('quantityInput').value) || 0;
+            const price = parseFloat(document.getElementById('priceInput').value) || 0;
+            const estimatedValue = quantity * price;
+            document.getElementById('estimatedValue').value = `$${estimatedValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
+        // Event listeners
+        document.getElementById('quantityInput').addEventListener('input', updateEstimatedValue);
+        document.getElementById('priceInput').addEventListener('input', updateEstimatedValue);
+
+        document.getElementById('buyBtn').addEventListener('click', function() {
+            alert('🚀 AI-Powered BUY Order Submitted!\n\nThe autonomous trading system will execute this order with optimal timing and routing.');
+        });
+
+        document.getElementById('sellBtn').addEventListener('click', function() {
+            alert('📉 AI-Powered SELL Order Submitted!\n\nThe autonomous trading system will execute this order with optimal timing and routing.');
+        });
+
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // News updates
+        const newsItems = [
+            "Breaking: Federal Reserve announces interest rate decision",
+            "Tech stocks rally on strong earnings reports",
+            "Oil prices surge amid geopolitical tensions",
+            "Cryptocurrency market shows signs of recovery",
+            "AI companies report record quarterly revenues",
+            "Green energy stocks gain momentum in trading",
+            "Banking sector faces regulatory scrutiny",
+            "Retail sales data exceeds market expectations"
+        ];
+
+        function addNewsItem() {
+            const newsFeed = document.getElementById('newsFeed');
+            const randomNews = newsItems[Math.floor(Math.random() * newsItems.length)];
+            const newsItem = document.createElement('div');
+            newsItem.className = 'news-item fade-in';
+            newsItem.innerHTML = `
+                <div class="news-time">Just now</div>
+                <div class="news-title">${randomNews}</div>
+            `;
+            
+            newsFeed.insertBefore(newsItem, newsFeed.firstChild);
+            
+            // Remove old news items (keep only 10)
+            while (newsFeed.children.length > 10) {
+                newsFeed.removeChild(newsFeed.lastChild);
+            }
+        }
+
+        // Start real-time updates
+        setInterval(updateMarketData, 3000);
+        setInterval(updateTime, 1000);
+        setInterval(updatePnL, 5000);
+        setInterval(addNewsItem, 30000);
+
+        // Initialize on load
+        updateTime();
+        updatePnL();
+
+        console.log('🚀 Professional Trading Dashboard Initialized');
+        console.log('📊 Real-time data feeds active');
+        console.log('🤖 AI trading system connected');
+    </script>
+</body>
+</html>
