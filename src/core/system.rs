@@ -6,6 +6,7 @@ use tokio::sync::{mpsc, RwLock};
 use tokio::time::{interval, Duration};
 use tracing::{info, warn, error};
 
+use crate::core::ai_thoughts::AIThoughtBroadcaster;
 use crate::core::config::SystemConfig;
 use crate::core::errors::{TradingError, TradingResult};
 use crate::core::types::{
@@ -27,6 +28,7 @@ pub struct TradingSystem {
     message_bus: MessageBus,
     system_context: Arc<RwLock<SystemContext>>,
     shutdown_signal: Arc<RwLock<bool>>,
+    thought_broadcaster: AIThoughtBroadcaster,
 }
 
 /// Registry of all active agents
@@ -106,12 +108,16 @@ impl TradingSystem {
             learning: None,
         };
         
+        // Initialize AI thought broadcaster
+        let thought_broadcaster = AIThoughtBroadcaster::new(1000); // Keep 1000 recent thoughts
+
         let system = Self {
             config,
             agents,
             message_bus,
             system_context,
             shutdown_signal: Arc::new(RwLock::new(false)),
+            thought_broadcaster,
         };
         
         info!("✅ Trading system initialized successfully");
@@ -174,6 +180,7 @@ impl TradingSystem {
                 self.config.agents.learning_engine.clone(),
                 self.message_bus.sender.clone(),
                 self.system_context.clone(),
+                self.thought_broadcaster.clone(),
             ).await?;
             self.agents.learning = Some(learning);
         }
@@ -296,6 +303,11 @@ impl TradingSystem {
         
         info!("✅ System shutdown completed");
         Ok(())
+    }
+
+    /// Get the AI thought broadcaster for external access
+    pub fn thought_broadcaster(&self) -> &AIThoughtBroadcaster {
+        &self.thought_broadcaster
     }
     
     /// Process inter-agent messages

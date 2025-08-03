@@ -59,9 +59,9 @@ strategy_generation = true
 
 [api.moomoo]
 base_url = "http://127.0.0.1:11111"
-api_key = "live_connection_71456526"
-secret_key = "live_opend_connection"
-paper_trading = false
+api_key = "demo_12345"
+secret_key = "demo_secret_67890"
+paper_trading = true
 timeout_ms = 5000
 retry_attempts = 3
 
@@ -69,6 +69,12 @@ retry_attempts = 3
 requests_per_second = 100
 burst_limit = 200
 backoff_strategy = "exponential"
+
+[[api.data_providers]]
+name = "moomoo"
+url = "http://127.0.0.1:11111"
+enabled = true
+priority = 1
 
 [monitoring]
 metrics_enabled = true
@@ -88,9 +94,11 @@ name = "momentum_scalping"
 enabled = true
 risk_limit = 1.0
 max_position_size = 10.0
+parameters = {}
 
 [[strategies]]
 name = "mean_reversion"
 enabled = true
 risk_limit = 1.0
 max_position_size = 10.0
+parameters = {}

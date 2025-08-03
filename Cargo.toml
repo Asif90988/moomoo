@@ -16,12 +16,16 @@ ndarray = { version = "0.15", features = ["rayon"] }
 ta = "0.5"
 rust_decimal = { version = "1.32", features = ["serde"] }
 
-# Enhanced AI and ML capabilities (simplified for now)
-# candle-core = "0.3"
-# candle-nn = "0.3"
-# candle-transformers = "0.3"
+# Enhanced AI and ML capabilities
+candle-core = { version = "0.9", optional = true }
+candle-nn = { version = "0.9", optional = true }
+candle-transformers = { version = "0.9", optional = true }
 tch = { version = "0.13", optional = true }
-# tokenizers = "0.15"
+tokenizers = "0.15"
+
+# Vector Database for AI Learning
+qdrant-client = { version = "1.11", optional = true }
+fastembed = { version = "5.0", optional = true }
 
 # Advanced async and concurrency
 async-trait = "0.1"
@@ -73,9 +77,11 @@ criterion = "0.5"
 proptest = "1.4"
 
 [features]
-default = []
-pytorch = ["tch"]
-database = ["sqlx", "redis"]
+default = ["ai-learning"]
+ai-learning = ["dep:qdrant-client", "dep:fastembed", "dep:candle-core", "dep:candle-nn"]
+pytorch = ["dep:tch"]
+database = ["dep:sqlx", "dep:redis"]
+full = ["ai-learning", "pytorch", "database"]
 
 [[bin]]
 name = "trading_agent"

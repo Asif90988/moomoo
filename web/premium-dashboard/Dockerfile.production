@@ -1,0 +1,94 @@
+# Neural Core Alpha-7 Production Dockerfile
+# Multi-stage build for optimized production image
+
+# Stage 1: Dependencies
+FROM node:18-alpine AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json* ./
+RUN npm ci --only=production --frozen-lockfile
+
+# Stage 2: Build
+FROM node:18-alpine AS builder
+WORKDIR /app
+
+# Copy dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy source code
+COPY . .
+
+# Set production environment
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Build the application
+RUN npm run build
+
+# Stage 3: Production Runtime
+FROM node:18-alpine AS runner
+WORKDIR /app
+
+# Create non-root user for security
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Set production environment
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# Install security updates and required packages
+RUN apk add --no-cache \
+    dumb-init \
+    curl \
+    ca-certificates \
+    && apk upgrade \
+    && rm -rf /var/cache/apk/*
+
+# Copy built application
+COPY --from=builder /app/public ./public
+
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+# Automatically leverage output traces to reduce image size
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Copy additional production files
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+
+# Create directories for logs and uploads
+RUN mkdir -p /app/logs /app/uploads \
+    && chown -R nextjs:nodejs /app/logs /app/uploads
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/api/health || exit 1
+
+# Switch to non-root user
+USER nextjs
+
+# Expose port
+EXPOSE 3000
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the application
+CMD ["node", "server.js"]
+
+# Labels for better image management
+LABEL \
+    org.opencontainers.image.title="Neural Core Alpha-7" \
+    org.opencontainers.image.description="Revolutionary AI-Transparent Trading Platform" \
+    org.opencontainers.image.vendor="Neural Core Technologies" \
+    org.opencontainers.image.version="1.0.0" \
+    org.opencontainers.image.created="2024-01-15T00:00:00Z" \
+    org.opencontainers.image.source="https://github.com/Asif90988/NEURAL-CORE-ALPHA-7" \
+    org.opencontainers.image.licenses="MIT"

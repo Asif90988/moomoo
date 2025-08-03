@@ -176,7 +176,9 @@ impl SystemConfig {
     /// Load configuration from environment variables and config file
     pub async fn load() -> Result<Self> {
         // Try to load from config file first
-        if let Ok(config) = Self::load_from_file("config.toml").await {
+        if let Ok(mut config) = Self::load_from_file("config.toml").await {
+            // Apply environment variable overrides to loaded config
+            config.apply_env_overrides();
             return Ok(config);
         }
 
@@ -186,16 +188,30 @@ impl SystemConfig {
 
     /// Load configuration from a TOML file
     pub async fn load_from_file<P: AsRef<Path>>(path: P) -> Result<Self> {
-        let content = fs::read_to_string(path).await?;
-        let config: SystemConfig = toml::from_str(&content)?;
-        Ok(config)
+        let path_ref = path.as_ref();
+        println!("DEBUG: Attempting to load config from: {:?}", path_ref);
+        let content = fs::read_to_string(path_ref).await?;
+        println!("DEBUG: Config file content length: {}", content.len());
+        println!("DEBUG: Config file content preview: {}", &content[..std::cmp::min(200, content.len())]);
+        
+        match toml::from_str::<SystemConfig>(&content) {
+            Ok(config) => {
+                println!("DEBUG: TOML parsing successful!");
+                println!("DEBUG: Loaded API key: '{}' (length: {})", config.api.moomoo.api_key, config.api.moomoo.api_key.len());
+                Ok(config)
+            }
+            Err(e) => {
+                println!("DEBUG: TOML parsing failed: {}", e);
+                Err(e.into())
+            }
+        }
     }
 
     /// Create default configuration with environment variable overrides
     pub fn default_with_env() -> Self {
         let mut config = Self::default();
 
-        // Override with environment variables
+        // Override with environment variables only if they exist
         if let Ok(capital) = env::var("INITIAL_CAPITAL") {
             if let Ok(amount) = capital.parse::<f64>() {
                 config.trading.initial_capital = Decimal::from_f64_retain(amount).unwrap_or(config.trading.initial_capital);
@@ -215,6 +231,28 @@ impl SystemConfig {
         }
 
         config
+    }
+
+    /// Apply environment variable overrides to loaded config
+    pub fn apply_env_overrides(&mut self) {
+        // Override with environment variables only if they exist
+        if let Ok(capital) = env::var("INITIAL_CAPITAL") {
+            if let Ok(amount) = capital.parse::<f64>() {
+                self.trading.initial_capital = Decimal::from_f64_retain(amount).unwrap_or(self.trading.initial_capital);
+            }
+        }
+
+        if let Ok(api_key) = env::var("MOOMOO_API_KEY") {
+            self.api.moomoo.api_key = api_key;
+        }
+
+        if let Ok(secret_key) = env::var("MOOMOO_SECRET_KEY") {
+            self.api.moomoo.secret_key = secret_key;
+        }
+
+        if let Ok(paper_trading) = env::var("PAPER_TRADING") {
+            self.api.moomoo.paper_trading = paper_trading.to_lowercase() == "true";
+        }
     }
 
     /// Save configuration to a TOML file
@@ -244,14 +282,27 @@ impl SystemConfig {
             anyhow::bail!("VaR confidence level must be between 0 and 1");
         }
 
-        // Validate API configuration
-        if self.api.moomoo.api_key.is_empty() {
-            anyhow::bail!("Moomoo API key is required");
+        // Validate API configuration for Moomoo's session-based architecture
+        // Moomoo uses OpenD local gateway - authentication is handled externally
+        if self.api.moomoo.base_url.contains("localhost") || self.api.moomoo.base_url.contains("127.0.0.1") {
+            // Local OpenD connection - API key is optional (session-based auth)
+            if self.api.moomoo.api_key.is_empty() {
+                println!("INFO: Using session-based authentication via OpenD local gateway");
+            }
+            return Ok(());
         }
         
-        // Allow demo keys and live connection keys for testing
-        if self.api.moomoo.api_key.starts_with("demo_") && !self.api.moomoo.paper_trading {
-            anyhow::bail!("Demo API keys can only be used with paper trading enabled");
+        // For non-local connections, require API key
+        if self.api.moomoo.api_key.is_empty() {
+            anyhow::bail!("Moomoo API key is required for non-local connections");
+        }
+        
+        // Allow demo keys for testing (must have paper trading enabled)
+        if self.api.moomoo.api_key.starts_with("demo_") {
+            if !self.api.moomoo.paper_trading {
+                anyhow::bail!("Demo API keys can only be used with paper trading enabled");
+            }
+            return Ok(()); // Demo key is valid, skip other validation
         }
         
         // Allow live connection keys for OpenD integration

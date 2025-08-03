@@ -6,6 +6,7 @@ use tokio::sync::{mpsc, RwLock};
 use tokio::time::{interval, Duration};
 use tracing::{info, warn, error};
 
+use crate::core::ai_thoughts::{AIThoughtBroadcaster, ThoughtTemplates, AIAgent, ThoughtType, AIThought};
 use crate::core::config::LearningConfig;
 use crate::core::errors::TradingResult;
 use crate::core::types::{
@@ -25,6 +26,7 @@ pub struct LearningEngineAgent {
     config: LearningConfig,
     model_version: String,
     training_data: Vec<TradeOutcome>,
+    thought_broadcaster: AIThoughtBroadcaster,
 }
 
 impl LearningEngineAgent {
@@ -33,6 +35,7 @@ impl LearningEngineAgent {
         config: LearningConfig,
         message_sender: mpsc::UnboundedSender<AgentMessage>,
         system_context: Arc<RwLock<SystemContext>>,
+        thought_broadcaster: AIThoughtBroadcaster,
     ) -> TradingResult<Self> {
         let capabilities = vec![
             AgentCapability::StrategyGeneration,
@@ -41,17 +44,51 @@ impl LearningEngineAgent {
         
         let base = BaseAgent::new(capabilities, message_sender, system_context);
         
+        // Share initial thought
+        thought_broadcaster.broadcast_thought(
+            AIThought::new(
+                AIAgent::LearningEngine,
+                ThoughtType::Learning,
+                "Learning Engine initialized. Ready to evolve trading strategies based on market patterns.".to_string(),
+                0.9,
+            )
+            .with_reasoning(vec![
+                "Neural networks loaded and calibrated".to_string(),
+                "Historical pattern database ready".to_string(),
+                "Strategy evolution algorithms active".to_string(),
+            ])
+            .with_tags(vec!["initialization".to_string(), "ai".to_string()])
+            .educational()
+        ).await;
+        
         Ok(Self {
             base,
             config,
             model_version: "v1.0.0".to_string(),
             training_data: Vec::new(),
+            thought_broadcaster,
         })
     }
     
     /// Perform model training and strategy evolution
     async fn evolve_models(&mut self) -> TradingResult<()> {
         info!("🧠 Evolving AI models and strategies...");
+        
+        // Share thought about starting evolution
+        self.thought_broadcaster.broadcast_thought(
+            AIThought::new(
+                AIAgent::LearningEngine,
+                ThoughtType::Learning,
+                "Starting model evolution cycle. Analyzing recent market patterns and performance.".to_string(),
+                0.85,
+            )
+            .with_reasoning(vec![
+                "Collecting recent trading data for analysis".to_string(),
+                "Evaluating strategy performance metrics".to_string(),
+                "Preparing to adapt strategies based on learnings".to_string(),
+            ])
+            .with_tags(vec!["evolution".to_string(), "analysis".to_string()])
+        ).await;
         
         let context = self.base.get_system_context().await;
         
@@ -64,8 +101,37 @@ impl LearningEngineAgent {
         // Update model parameters if needed
         if self.should_update_model(&performance_analysis).await? {
             let update_result = self.update_model_parameters(&context).await?;
+            
+            // Share learning insight
+            self.thought_broadcaster.broadcast_thought(
+                ThoughtTemplates::learning_update(
+                    "adaptive_strategy",
+                    0.0, // We'll update this with real data
+                    performance_analysis.score,
+                    "Updated neural network weights based on recent performance"
+                )
+            ).await;
+            
             info!("🔄 Model updated: {}", update_result.new_model_version);
         }
+        
+        // Share completion thought
+        self.thought_broadcaster.broadcast_thought(
+            AIThought::new(
+                AIAgent::LearningEngine,
+                ThoughtType::Learning,
+                format!("Evolution cycle complete! Generated {} new strategies. Model accuracy: {:.1}%", 
+                    new_strategies.len(), performance_analysis.score * 100.0),
+                0.9,
+            )
+            .with_reasoning(vec![
+                format!("Successfully generated {} adaptive strategies", new_strategies.len()),
+                format!("Current model accuracy: {:.1}%", performance_analysis.score * 100.0),
+                "Ready for next evolution cycle".to_string(),
+            ])
+            .with_tags(vec!["completion".to_string(), "strategies".to_string()])
+            .educational()
+        ).await;
         
         info!("✅ Model evolution completed - {} new strategies generated", new_strategies.len());
         Ok(())

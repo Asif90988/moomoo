@@ -17,6 +17,7 @@ mod infrastructure;
 mod governance;
 mod interfaces;
 mod utils;
+mod vector_store;
 
 use crate::core::system::TradingSystem;
 use crate::core::config::SystemConfig;
@@ -40,7 +41,7 @@ async fn main() -> Result<()> {
     info!("📁 Loading configuration from config.toml...");
     let config = SystemConfig::load().await?;
     info!("⚙️  Configuration loaded successfully");
-    info!("🔑 API Key: {}", if config.api.moomoo.api_key.is_empty() { "EMPTY" } else { "SET" });
+    info!("🔑 API Key: {} (length: {})", if config.api.moomoo.api_key.is_empty() { "EMPTY" } else { &config.api.moomoo.api_key }, config.api.moomoo.api_key.len());
     info!("📄 Paper Trading: {}", config.api.moomoo.paper_trading);
 
     // Initialize the trading system
