@@ -33,7 +33,10 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
   const { activePanel, setActivePanel } = useTradingStore();
 
   const navigation = [
-    { id: 'trading', name: 'Trading', icon: TrendingUp, color: 'neon-blue' },
+    { id: 'unified-ai-trading', name: '🚀 Neural Core Alpha-7', icon: Zap, color: 'neon-purple', badge: 'QUANTUM' },
+    { id: 'multi-broker', name: '🔗 Multi-Broker Hub', icon: Server, color: 'neon-cyan', badge: 'LIVE' },
+    { id: 'binance-crypto', name: '₿ Binance Crypto', icon: TrendingUp, color: 'neon-orange', badge: 'NEW' },
+    { id: 'trading', name: 'Manual Trading', icon: TrendingUp, color: 'neon-blue' },
     { id: 'portfolio', name: 'Portfolio', icon: Briefcase, color: 'neon-green' },
     { id: 'ai-thoughts', name: '🧠 AI Thoughts Live', icon: Brain, color: 'neon-purple' },
     { id: 'trust-metrics', name: '🏆 Trust & Truth', icon: Shield, color: 'neon-pink' },

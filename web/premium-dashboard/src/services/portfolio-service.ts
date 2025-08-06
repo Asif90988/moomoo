@@ -137,17 +137,17 @@ class PortfolioService {
         this.portfolio = portfolio;
         this.notifySubscribers();
       } else {
-        // Create initial empty portfolio
+        // Create initial empty portfolio - RESPECT $300 BASELINE
         this.portfolio = {
-          totalValue: 1000, // Default paper trading balance
+          totalValue: 300.00, // Fixed $300 baseline for autonomous trading
           totalPnl: 0,
           totalPnlPercent: 0,
           dayPnl: 0,
           dayPnlPercent: 0,
-          cash: 1000,
-          buyingPower: 1000,
+          cash: 300.00,
+          buyingPower: 300.00,
           marginUsed: 0,
-          marginAvailable: 1000,
+          marginAvailable: 300.00,
           positions: [],
           orders: []
         };
@@ -161,15 +161,16 @@ class PortfolioService {
   // Refresh portfolio from API
   private async refreshPortfolio(userId: string, tradingAccountId: string) {
     try {
-      if (moomooAPI.isApiConnected?.()) {
-        const result = await moomooAPI.getPortfolio();
-        if (result.success && result.data) {
-          this.updatePortfolio(result.data);
-        }
-      } else {
-        // Simulate portfolio updates for development
-        this.simulatePortfolioUpdate();
-      }
+      // TODO: Implement when MoomooAPI getPortfolio is available
+      // Type conflicts between trading and portfolio service Portfolio types
+      // if (moomooAPI.isApiConnected?.()) {
+      //   const result = await moomooAPI.getPortfolio();
+      //   if (result.success && result.data) {
+      //     this.updatePortfolio(result.data);
+      //   }
+      // DISABLED: Don't simulate portfolio updates - let AI trading handle portfolio changes
+      // this.simulatePortfolioUpdate();
+      console.log('📊 Portfolio service: Skipping mock updates - AI trading active');
     } catch (error) {
       console.error('Failed to refresh portfolio:', error);
     }

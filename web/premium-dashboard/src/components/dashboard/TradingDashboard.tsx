@@ -6,7 +6,7 @@ import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { MainContent } from './MainContent';
 import { useTradingStore } from '@/stores/trading-store';
-import { useWebSocket } from '@/services/websocket';
+// import { useWebSocket } from '@/services/websocket'; // Disabled - no WebSocket server
 import { useHotkeys } from 'react-hotkeys-hook';
 import AIThoughtsTicker from '../ai/AIThoughtsTicker';
 import TimeSquareTickerSystem from '../ai/TimeSquareTickerSystem';
@@ -17,7 +17,7 @@ import RotatingTrustBanner from '../ai/RotatingTrustBanner';
 export function TradingDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { layout, activePanel, setActivePanel } = useTradingStore();
-  const ws = useWebSocket();
+  // const ws = useWebSocket(); // Disabled - no WebSocket server
 
   // Trading hotkeys
   useHotkeys('ctrl+1', () => setActivePanel('trading'));
@@ -29,16 +29,14 @@ export function TradingDashboard() {
   useHotkeys('esc', () => setActivePanel('trading')); // Reset to main
 
   useEffect(() => {
-    // Initialize WebSocket connections
-    ws.on('connection_status', (status) => {
-      console.log('Connection status:', status);
-    });
-
+    // WebSocket connections disabled for development
+    console.log('WebSocket connections disabled in TradingDashboard');
+    
+    // No WebSocket initialization to prevent timeout errors
     return () => {
-      // Cleanup listeners
-      ws.off('connection_status');
+      // No cleanup needed since WebSocket is disabled
     };
-  }, [ws]);
+  }, []);
 
   const sidebarWidth = sidebarCollapsed ? 'w-16' : 'w-64';
   const contentWidth = sidebarCollapsed ? 'w-[calc(100%-4rem)]' : 'w-[calc(100%-16rem)]';
@@ -84,51 +82,9 @@ export function TradingDashboard() {
             <AIThoughtsTicker />
           </div>
 
-          {/* Split Layout: AI Banner (Left) + Deposit Protection (Right) */}
+          {/* AI Banner Only */}
           <div className="px-4 py-1 relative z-20">
-            <div className="flex gap-4 items-center">
-              {/* Left Side - Compact AI Banner */}
-              <div className="flex-1">
-                <RotatingTrustBanner />
-              </div>
-              
-              {/* Right Side - Deposit Protection */}
-              <div className="flex-1">
-                <div className="bg-gradient-to-r from-yellow-900/90 to-orange-900/90 backdrop-blur-md border border-yellow-500/40 rounded-lg overflow-hidden shadow-xl">
-                  <div className="relative bg-gradient-to-r from-yellow-500/20 to-orange-500/20 p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400/20 to-orange-400/20 backdrop-blur-sm border border-yellow-500/40 flex items-center justify-center shadow-lg">
-                          <span className="text-xl">🛡️</span>
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-300 mb-1">
-                            Maximum Deposit Protection
-                          </h3>
-                          <p className="text-lg font-bold text-yellow-400">
-                            $300 Limit
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            Education over extraction - Building trust
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end space-y-2">
-                        <div className="text-right">
-                          <span className="text-xs text-gray-400">Protection</span>
-                          <p className="text-sm font-bold text-yellow-400">
-                            100%
-                          </p>
-                        </div>
-                        <div className="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
-                          <div className="h-full bg-yellow-400 rounded-full w-full" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <RotatingTrustBanner />
           </div>
         </>
       )}

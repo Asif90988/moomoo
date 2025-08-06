@@ -198,7 +198,7 @@ const AlternativeDataDashboard: React.FC = () => {
     const signals: AlternativeSignal[] = symbols.map(symbol => {
       const signal = (Math.random() - 0.5) * 0.1; // -5% to +5%
       const strength = Math.abs(signal);
-      const direction = signal > 0.01 ? 'BUY' : signal < -0.01 ? 'SELL' : 'HOLD';
+      const direction: 'BUY' | 'SELL' | 'HOLD' = signal > 0.01 ? 'BUY' : signal < -0.01 ? 'SELL' : 'HOLD';
       const confidence = Math.min(strength * 20, 1.0);
 
       return {

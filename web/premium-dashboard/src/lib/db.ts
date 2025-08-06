@@ -55,7 +55,7 @@ export const validateAndCreateDeposit = async (userId: string, amount: number) =
     throw new Error('User not found');
   }
 
-  const totalDeposited = user.deposits.reduce((sum, deposit) => sum + deposit.amount, 0);
+  const totalDeposited = user.deposits.reduce((sum: number, deposit: any) => sum + deposit.amount, 0);
   const maxDeposit = user.maxDepositLimit;
 
   // Neural Core Protection validations
@@ -90,7 +90,7 @@ export const validateAndCreateDeposit = async (userId: string, amount: number) =
 
 // Complete deposit and update account balance
 export const completeDeposit = async (depositId: string) => {
-  return await db.$transaction(async (tx) => {
+  return await db.$transaction(async (tx: any) => {
     // Get deposit
     const deposit = await tx.deposit.findUnique({
       where: { id: depositId },

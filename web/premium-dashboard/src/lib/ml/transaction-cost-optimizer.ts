@@ -54,7 +54,7 @@ interface MarketData {
   liquidityScore: number;
 }
 
-export class TransactionCostOptimizer {
+class TransactionCostOptimizer {
   private riskModel: CovarianceMatrix;
   private costModel: CostModel;
   private constraints: TradingConstraints;
@@ -634,4 +634,5 @@ class CostModel {
 }
 
 // Export main class and utilities
-export { TransactionCostOptimizer, TradingConstraints, OptimizationResult, ExecutionPlan };
+export { TransactionCostOptimizer };
+export type { TradingConstraints, OptimizationResult, ExecutionPlan };

@@ -1,20 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
-import { Brain, Activity, Wifi, WifiOff, AlertTriangle } from 'lucide-react';
+import { Brain, Activity, Wifi, WifiOff, AlertTriangle, LogOut } from 'lucide-react';
 import { useTradingStore, usePortfolioPnL, useConnectionStatus } from '@/stores/trading-store';
+import { useHydrationSafe } from '@/hooks/useHydrationSafe';
 
 export function Header() {
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const router = useRouter();
   const connectionStatus = useConnectionStatus();
   const { totalPnl, dayPnl, dayPnlPercent } = usePortfolioPnL();
+  const isMounted = useHydrationSafe();
 
   useEffect(() => {
-    setMounted(true);
-    setCurrentTime(new Date());
-  }, []);
+    if (isMounted) {
+      setCurrentTime(new Date());
+    }
+  }, [isMounted]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -23,6 +29,24 @@ export function Header() {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (showUserMenu && !target.closest('.user-menu-container')) {
+        setShowUserMenu(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showUserMenu]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -65,6 +89,16 @@ export function Header() {
       default:
         return 'Disconnected';
     }
+  };
+
+  const handleLogout = () => {
+    // Clear authentication data
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('user');
+    document.cookie = 'isAuthenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+    
+    // Redirect to login
+    router.push('/login');
   };
 
   return (
@@ -169,7 +203,7 @@ export function Header() {
           <div className="text-center">
             <div className="text-xs text-gray-400">Time</div>
             <div className="font-mono font-bold text-sm text-white">
-              {mounted && currentTime ? formatTime(currentTime) : '--:--:--'}
+              {isMounted && currentTime ? formatTime(currentTime) : '--:--:--'}
             </div>
           </div>
         </div>
@@ -180,15 +214,72 @@ export function Header() {
           <div className="font-mono font-bold text-sm text-neon-blue">71456526</div>
         </div>
         
-        {/* User Avatar */}
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-10 h-10 rounded-full bg-gradient-to-r from-neon-blue to-neon-purple flex items-center justify-center cursor-pointer"
-          onClick={() => console.log('User menu clicked')}
-        >
-          <span className="text-white font-bold text-sm">A</span>
-        </motion.div>
+        {/* User Avatar with Dropdown */}
+        <div className="relative user-menu-container">
+          <div
+            className="w-10 h-10 rounded-full bg-gradient-to-r from-neon-blue to-neon-purple flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-200 ring-2 ring-transparent hover:ring-neon-blue/30"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Avatar clicked, current state:', showUserMenu);
+              setShowUserMenu(prev => {
+                const newState = !prev;
+                console.log('Setting new state:', newState);
+                return newState;
+              });
+            }}
+          >
+            <span className="text-white font-bold text-sm">A</span>
+          </div>
+
+          {/* Dropdown Menu rendered via Portal to escape stacking context */}
+          {showUserMenu && isMounted && createPortal(
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              transition={{ duration: 0.15 }}
+              className="fixed right-6 top-20 w-56 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden"
+              style={{ 
+                zIndex: 999999,
+                position: 'fixed',
+                backgroundColor: 'rgb(17 24 39)',
+                border: '1px solid rgb(55 65 81)'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="p-4 border-b border-gray-700/50 bg-gradient-to-r from-gray-800/50 to-gray-900/50">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-neon-blue to-neon-purple flex items-center justify-center">
+                    <span className="text-white font-bold text-xs">A</span>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-white">Administrator</div>
+                    <div className="text-xs text-gray-400">admin@lafzusa.com</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Menu Items */}
+              <div className="py-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    console.log('Logout clicked');
+                    setShowUserMenu(false);
+                    handleLogout();
+                  }}
+                  className="w-full flex items-center px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-150 group"
+                >
+                  <LogOut className="w-4 h-4 mr-3 text-gray-400 group-hover:text-red-400 transition-colors" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </motion.div>,
+            document.body
+          )}
+        </div>
       </div>
     </motion.header>
   );

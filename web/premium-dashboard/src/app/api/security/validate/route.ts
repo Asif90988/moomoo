@@ -49,8 +49,8 @@ export async function GET(req: NextRequest) {
 }
 
 function checkEnvironmentVariables() {
-  const issues = [];
-  const warnings = [];
+  const issues: any[] = [];
+  const warnings: any[] = [];
 
   // Check for NEXT_PUBLIC_ secrets (security vulnerability)
   const publicSecrets = Object.keys(process.env).filter(key => 

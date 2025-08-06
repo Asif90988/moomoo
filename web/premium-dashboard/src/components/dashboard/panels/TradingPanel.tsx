@@ -1,20 +1,124 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import AIMarketVisualization from '@/components/charts/AIMarketVisualization';
 import { MarketDataPanel } from '@/components/market/MarketDataPanel';
 import { OrderEntryPanel } from '@/components/trading/OrderEntryPanel';
 import { AIInsightsPanel } from '@/components/ai/AIInsightsPanel';
+import { autonomousTradingService } from '@/services/autonomous-trading-service';
+import { useTradingStore } from '@/stores/trading-store';
+import { Play, Pause, Settings, Activity, Brain, Zap } from 'lucide-react';
 
 export function TradingPanel() {
+  const [isAutonomousEnabled, setIsAutonomousEnabled] = useState(false);
+  const [serviceState, setServiceState] = useState(autonomousTradingService.getState());
+  const { autoTrades, totalProfit } = useTradingStore();
+
+  // Update service state periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setServiceState(autonomousTradingService.getState());
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const toggleAutonomousTrading = () => {
+    if (isAutonomousEnabled) {
+      // Stop all autonomous trading
+      autonomousTradingService.stopAlpacaTrading();
+      autonomousTradingService.stopMoomooTrading();
+      console.log('🛑 Stopped all autonomous trading from Trading Panel');
+    } else {
+      // Start autonomous trading for available brokers
+      autonomousTradingService.startAlpacaTrading();
+      autonomousTradingService.startMoomooTrading();
+      console.log('🚀 Started autonomous trading from Trading Panel');
+    }
+    setIsAutonomousEnabled(!isAutonomousEnabled);
+  };
+
   return (
     <div className="min-h-screen overflow-y-auto space-y-6 p-4">
+
+      {/* Autonomous Trading Control Panel */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="glass rounded-xl border border-neural-border p-6"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <Brain className="w-6 h-6 text-neon-purple" />
+            <h3 className="text-xl font-bold text-white">Autonomous Trading Control</h3>
+            {isAutonomousEnabled && (
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-green-400 text-sm font-medium">ACTIVE</span>
+              </div>
+            )}
+          </div>
+          
+          <button
+            onClick={toggleAutonomousTrading}
+            className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center gap-2 ${
+              isAutonomousEnabled
+                ? 'bg-red-600 hover:bg-red-700 text-white'
+                : 'bg-green-600 hover:bg-green-700 text-white'
+            }`}
+          >
+            {isAutonomousEnabled ? (
+              <>
+                <Pause className="w-5 h-5" />
+                STOP AUTONOMOUS TRADING
+              </>
+            ) : (
+              <>
+                <Play className="w-5 h-5" />
+                START AUTONOMOUS TRADING
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Trading Status Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Activity className="w-4 h-4 text-blue-400" />
+              <span className="text-gray-400 text-sm">Total Trades</span>
+            </div>
+            <div className="text-2xl font-mono text-white">{autoTrades.length}</div>
+          </div>
+          
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Zap className="w-4 h-4 text-green-400" />
+              <span className="text-gray-400 text-sm">Total P&L</span>
+            </div>
+            <div className={`text-2xl font-mono ${totalProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {totalProfit >= 0 ? '+' : ''}${totalProfit.toFixed(2)}
+            </div>
+          </div>
+          
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Settings className="w-4 h-4 text-purple-400" />
+              <span className="text-gray-400 text-sm">AI Status</span>
+            </div>
+            <div className="text-lg font-medium text-purple-400">
+              {isAutonomousEnabled ? 'Learning & Trading' : 'Standby'}
+            </div>
+          </div>
+        </div>
+      </motion.div>
 
       {/* AI Market Visualization - Main Feature */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
         className="h-96 glass rounded-xl border border-neural-border overflow-hidden"
       >
         <AIMarketVisualization />

@@ -3,7 +3,33 @@
 // Based on Kelly et al. (2020) "Characteristics are Covariances"
 
 import { Matrix, EigenvalueDecomposition } from 'ml-matrix';
-import * as tf from '@tensorflow/tfjs';
+
+// Dynamic TensorFlow import for Node.js compatibility
+let tf: any = null;
+const initTensorFlow = async () => {
+  try {
+    if (typeof window === 'undefined') {
+      // Server-side: use Node.js backend
+      tf = await import('@tensorflow/tfjs-node');
+    } else {
+      // Client-side: use regular TensorFlow
+      tf = await import('@tensorflow/tfjs');
+    }
+    return tf;
+  } catch (error) {
+    console.warn('TensorFlow not available, using fallback implementation');
+    // Return a mock tf object for development
+    return {
+      tensor2d: () => ({ array: () => [], dataSync: () => [], dispose: () => {} }),
+      randomNormal: () => ({ array: () => [], dataSync: () => [], dispose: () => {} }),
+      matMul: () => ({ array: () => [], dataSync: () => [], dispose: () => {} }),
+      tidy: (fn: any) => fn(),
+      eye: () => ({ mul: () => ({ array: () => [], dataSync: () => [], dispose: () => {} }) }),
+      add: () => ({ array: () => [], dataSync: () => [], dispose: () => {} }),
+      linalg: { pinv: () => ({ array: () => [], dataSync: () => [], dispose: () => {} }) }
+    };
+  }
+};
 
 interface IPCAConfig {
   numFactors: number;
@@ -36,9 +62,9 @@ interface IPCAResult {
 
 export class IPCAFactorModel {
   private config: IPCAConfig;
-  private factors: tf.Tensor2D | null = null;
-  private loadings: tf.Tensor2D | null = null;
-  private timeVaryingBetas: tf.Tensor3D | null = null;
+  private factors: any | null = null;
+  private loadings: any | null = null;
+  private timeVaryingBetas: any | null = null;
   private isTrained: boolean = false;
 
   constructor(config: Partial<IPCAConfig> = {}) {
@@ -59,6 +85,11 @@ export class IPCAFactorModel {
    */
   async train(data: FactorData): Promise<IPCAResult> {
     console.log('🧠 Training IPCA Factor Model with time-varying loadings...');
+    
+    // Initialize TensorFlow
+    if (!tf) {
+      tf = await initTensorFlow();
+    }
     
     const { returns, characteristics, timestamps } = data;
     const [T, N] = [returns.length, returns[0].length];
@@ -136,11 +167,11 @@ export class IPCAFactorModel {
    * Update factors with time-varying loadings
    */
   private async updateTimeVaryingFactors(
-    returns: tf.Tensor2D, 
-    loadings: tf.Tensor2D, 
-    characteristics: tf.Tensor2D, 
-    beta: tf.Tensor2D
-  ): tf.Tensor2D {
+    returns: any, 
+    loadings: any, 
+    characteristics: any, 
+    beta: any
+  ): Promise<any> {
     return tf.tidy(() => {
       // Compute time-varying loadings: Λ_t = Z_t * β
       const timeVaryingLoadings = tf.matMul(characteristics, beta);
@@ -165,7 +196,7 @@ export class IPCAFactorModel {
   /**
    * Update static factors (fallback)
    */
-  private async updateFactors(returns: tf.Tensor2D, loadings: tf.Tensor2D): tf.Tensor2D {
+  private async updateFactors(returns: any, loadings: any): Promise<any> {
     return tf.tidy(() => {
       const loadingsTranspose = loadings.transpose();
       const gram = tf.add(
@@ -184,11 +215,11 @@ export class IPCAFactorModel {
    * Update loadings using characteristics
    */
   private async updateLoadings(
-    returns: tf.Tensor2D, 
-    factors: tf.Tensor2D, 
-    characteristics: tf.Tensor2D, 
-    beta: tf.Tensor2D
-  ): tf.Tensor2D {
+    returns: any, 
+    factors: any, 
+    characteristics: any, 
+    beta: any
+  ): Promise<any> {
     return tf.tidy(() => {
       // Use characteristics to inform loadings: Λ = Z * β
       const characteristicLoadings = tf.matMul(characteristics, beta);
@@ -218,9 +249,9 @@ export class IPCAFactorModel {
    * Update characteristic betas
    */
   private async updateCharacteristicBetas(
-    loadings: tf.Tensor2D, 
-    characteristics: tf.Tensor2D
-  ): tf.Tensor2D {
+    loadings: any, 
+    characteristics: any
+  ): Promise<any> {
     return tf.tidy(() => {
       const charTranspose = characteristics.transpose();
       const gram = tf.add(
@@ -239,11 +270,11 @@ export class IPCAFactorModel {
    * Compute loss function for convergence
    */
   private async computeLoss(
-    returns: tf.Tensor2D,
-    factors: tf.Tensor2D,
-    loadings: tf.Tensor2D,
-    characteristics: tf.Tensor2D,
-    beta: tf.Tensor2D
+    returns: any,
+    factors: any,
+    loadings: any,
+    characteristics: any,
+    beta: any
   ): Promise<number> {
     return tf.tidy(() => {
       // Reconstruction error
@@ -263,9 +294,9 @@ export class IPCAFactorModel {
    * Generate out-of-sample predictions
    */
   private async generatePredictions(
-    characteristics: tf.Tensor2D, 
-    beta: tf.Tensor2D
-  ): tf.Tensor2D {
+    characteristics: any, 
+    beta: any
+  ): Promise<any> {
     return tf.tidy(() => {
       // Predict loadings from characteristics
       const predictedLoadings = tf.matMul(characteristics, beta);
@@ -282,8 +313,8 @@ export class IPCAFactorModel {
    * Compute time-varying factor loadings for interpretation
    */
   private async computeTimeVaryingLoadings(
-    characteristics: tf.Tensor2D, 
-    beta: tf.Tensor2D, 
+    characteristics: any, 
+    beta: any, 
     timestamps: Date[]
   ): Promise<number[][][]> {
     return tf.tidy(() => {
@@ -295,7 +326,7 @@ export class IPCAFactorModel {
   /**
    * Compute eigenvalues for factor strength analysis
    */
-  private async computeEigenvalues(factors: tf.Tensor2D): Promise<number[]> {
+  private async computeEigenvalues(factors: any): Promise<number[]> {
     const factorArray = await factors.array() as number[][];
     const covariance = new Matrix(factorArray).transpose().mmul(new Matrix(factorArray));
     const eigen = new EigenvalueDecomposition(covariance);
@@ -306,9 +337,9 @@ export class IPCAFactorModel {
    * Compute explained variance by each factor
    */
   private async computeExplainedVariance(
-    returns: tf.Tensor2D, 
-    factors: tf.Tensor2D, 
-    loadings: tf.Tensor2D
+    returns: any, 
+    factors: any, 
+    loadings: any
   ): Promise<number[]> {
     return tf.tidy(() => {
       const totalVariance = tf.sum(tf.square(returns));
@@ -329,8 +360,8 @@ export class IPCAFactorModel {
    * Compute performance metrics
    */
   private async computePerformanceMetrics(
-    returns: tf.Tensor2D, 
-    predictions: tf.Tensor2D
+    returns: any, 
+    predictions: any
   ): Promise<{ sharpeRatio: number; informationRatio: number; maxDrawdown: number }> {
     const returnsArray = await returns.array() as number[][];
     const predictionsArray = await predictions.array() as number[][];
@@ -388,6 +419,11 @@ export class IPCAFactorModel {
   async predict(characteristics: number[]): Promise<number[]> {
     if (!this.isTrained || !this.factors || !this.loadings) {
       throw new Error('Model must be trained before making predictions');
+    }
+
+    // Initialize TensorFlow if needed
+    if (!tf) {
+      tf = await initTensorFlow();
     }
 
     return tf.tidy(() => {

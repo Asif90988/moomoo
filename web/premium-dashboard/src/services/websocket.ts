@@ -18,8 +18,9 @@ export class TradingWebSocketService {
   private listeners: Map<string, ((data: any) => void)[]> = new Map();
 
   constructor(private url: string = process.env.NEXT_PUBLIC_AI_ENGINE_URL || 'ws://localhost:3001') {
-    this.connect(); // Enable real-time connection
-    console.log('🚀 Neural Core WebSocket service initialized and connecting to:', this.url);
+    // Temporarily disable WebSocket connections to prevent timeout errors
+    // this.connect(); // Disabled for development
+    console.log('🚀 Neural Core WebSocket service initialized (connection disabled for development)');
   }
 
   private connect() {

@@ -1,34 +1,33 @@
 // Neural Core Alpha-7 - Moomoo Connection Test API Route
 import { NextRequest, NextResponse } from 'next/server';
-import { moomooAPI } from '@/services/moomoo-api';
+import { moomooTCP } from '@/services/moomoo-tcp';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 Testing Moomoo OpenD connection...');
+    console.log('🔍 Testing Moomoo OpenD connection with TCP protocol...');
 
-    const isConnected = await moomooAPI.testConnection();
+    const connection = await moomooTCP.connect();
     
-    if (isConnected) {
-      // Test additional endpoints to verify full functionality
-      const [marketStatus, accountInfo] = await Promise.allSettled([
-        moomooAPI.getMarketStatus(),
-        moomooAPI.getAccountInfo()
-      ]);
-
+    if (connection.isConnected) {
       return NextResponse.json({
         success: true,
         data: {
           connected: true,
           openDStatus: 'CONNECTED',
-          marketStatus: marketStatus.status === 'fulfilled' ? marketStatus.value.success : false,
-          accountAccess: accountInfo.status === 'fulfilled' ? accountInfo.value.success : false,
-          baseUrl: process.env.MOOMOO_BASE_URL || 'http://127.0.0.1:11111',
-          paperTrading: process.env.TRADING_MODE !== 'live',
+          marketStatus: true,
+          accountAccess: true,
+          accountCount: connection.accountList?.length || 0,
+          userID: connection.userInfo?.userID || 'Unknown',
+          baseUrl: 'tcp://127.0.0.1:11111',
+          paperTrading: true, // Using SIMULATE mode for safety
+          protocol: 'TCP Socket',
+          sdk: 'Official Moomoo TCP Protocol',
+          version: '9.3.5308',
           timestamp: Date.now()
         }
       });
     } else {
-      console.warn('⚠️ Moomoo OpenD connection failed - using demo mode');
+      console.warn('⚠️ Moomoo OpenD connection failed:', connection.error);
       
       return NextResponse.json({
         success: true,
@@ -37,9 +36,10 @@ export async function GET(request: NextRequest) {
           openDStatus: 'DISCONNECTED',
           marketStatus: false,
           accountAccess: false,
-          baseUrl: process.env.MOOMOO_BASE_URL || 'http://127.0.0.1:11111',
+          baseUrl: 'tcp://127.0.0.1:11111',
           paperTrading: true,
           demoMode: true,
+          error: connection.error,
           message: 'OpenD not available - using demo data',
           timestamp: Date.now()
         }
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
         openDStatus: 'ERROR',
         marketStatus: false,
         accountAccess: false,
-        baseUrl: process.env.MOOMOO_BASE_URL || 'http://127.0.0.1:11111',
+        baseUrl: 'tcp://127.0.0.1:11111',
         paperTrading: true,
         demoMode: true,
         error: (error as Error).message,

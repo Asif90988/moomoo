@@ -8,6 +8,7 @@ const nextConfig = {
   },
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
+    PORT: '3001', // Force static port
   },
   webpack: (config, { isServer }) => {
     // Handle WebSocket connections

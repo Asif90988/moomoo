@@ -2,6 +2,7 @@
 
 import { useEffect, ReactNode } from 'react';
 import { useTradingStore } from '@/stores/trading-store';
+import { moomooAPI } from '@/services/moomoo-api';
 // import { wsService } from '@/services/websocket'; // Disabled for development
 import type { 
   MarketData, 
@@ -26,7 +27,8 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
     setConnectionStatus,
     addOrder,
     updateOrder,
-    watchlist
+    watchlist,
+    portfolio
   } = useTradingStore();
 
   useEffect(() => {
@@ -56,52 +58,60 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
       }));
     };
 
-    // Generate mock portfolio
-    const generateMockPortfolio = (): Portfolio => ({
-      totalValue: 125000 + Math.random() * 50000,
-      cash: 25000 + Math.random() * 10000,
-      buyingPower: 50000 + Math.random() * 20000,
-      marginUsed: 5000 + Math.random() * 3000,
-      marginAvailable: 45000 + Math.random() * 17000,
-      dayPnl: -1000 + Math.random() * 2000,
-      dayPnlPercent: -2 + Math.random() * 4,
-      totalPnl: 15000 + Math.random() * 10000,
-      totalPnlPercent: 12 + Math.random() * 8,
-      positions: [
-        {
-          id: '1',
-          symbol: 'AAPL',
-          quantity: 100,
-          avgCost: 180.50,
-          marketValue: 18525,
-          pnl: 475,
-          pnlPercent: 2.63,
-          side: 'long' as const,
-          openTime: Date.now() - 86400000,
-          lastUpdate: Date.now()
-        },
-        {
-          id: '2',
-          symbol: 'TSLA',
-          quantity: 50,
-          avgCost: 220.00,
-          marketValue: 10790,
-          pnl: -210,
-          pnlPercent: -1.91,
-          side: 'long' as const,
-          openTime: Date.now() - 172800000,
-          lastUpdate: Date.now()
+    // Fetch real portfolio from MooMoo API or fallback to mock
+    const fetchRealPortfolio = async (): Promise<Portfolio> => {
+      try {
+        console.log('🔍 [REAL MOOMOO] Attempting to fetch portfolio...');
+        
+        // Test connection first
+        const isConnected = await moomooAPI.testConnection();
+        if (isConnected) {
+          console.log('✅ [REAL MOOMOO] Connected! Fetching real portfolio...');
+          
+          const portfolioResponse = await moomooAPI.getPortfolio();
+          if (portfolioResponse.success && portfolioResponse.data) {
+            console.log('✅ [REAL MOOMOO] Real portfolio fetched successfully:', portfolioResponse.data.totalValue);
+            return portfolioResponse.data;
+          }
         }
-      ],
-      orders: []
-    });
+        
+        console.warn('⚠️ [MOOMOO] API not available, using fallback portfolio');
+      } catch (error) {
+        console.warn('⚠️ [MOOMOO] Connection failed:', error);
+      }
+      
+      // Fallback to mock portfolio
+      const mockPortfolio = {
+        totalValue: 300.00, // Fixed at $300 baseline - no random values
+        cash: 300.00,
+        buyingPower: 300.00,
+        marginUsed: 0,
+        marginAvailable: 300.00,
+        dayPnl: 0.00,
+        dayPnlPercent: 0.00,
+        totalPnl: 0.00,
+        totalPnlPercent: 0.00,
+        positions: [], // Start with empty positions - AI will build the portfolio
+        orders: [] // Start with no orders
+      };
+      console.log('🏦 WebSocketProvider: Using fallback portfolio with value:', mockPortfolio.totalValue);
+      return mockPortfolio;
+    };
 
-    // Set up mock data simulation
-    const setupMockData = () => {
-      setTimeout(() => {
+    // Set up real data integration with MooMoo API
+    const setupRealData = () => {
+      setTimeout(async () => {
         setConnectionStatus('connected');
         setMarketData(generateMockMarketData());
-        setPortfolio(generateMockPortfolio());
+        
+        // Only set portfolio if it doesn't exist (don't override existing state)
+        if (!portfolio) {
+          console.log('🏦 WebSocketProvider: No existing portfolio, fetching from MooMoo...');
+          const realPortfolio = await fetchRealPortfolio();
+          setPortfolio(realPortfolio);
+        } else {
+          console.log('🏦 WebSocketProvider: Portfolio already exists with value:', portfolio.totalValue);
+        }
         
         // Add mock AI insights
         addAIInsight({
@@ -192,7 +202,7 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
       };
     };
 
-    const cleanup = setupMockData();
+    const cleanup = setupRealData();
     return cleanup;
     // Connection status handler
     const handleConnectionStatus = (status: any) => {
@@ -266,7 +276,8 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
     setConnectionStatus,
     addOrder,
     updateOrder,
-    watchlist
+    watchlist,
+    portfolio
   ]);
 
   return <>{children}</>;

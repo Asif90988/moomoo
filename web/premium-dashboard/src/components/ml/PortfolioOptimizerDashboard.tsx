@@ -64,9 +64,9 @@ const PortfolioOptimizerDashboard: React.FC = () => {
         targetWeight,
         change,
         changePercent,
-        action: Math.abs(change) < 0.001 ? 'HOLD' : change > 0 ? 'BUY' : 'SELL',
+        action: Math.abs(change) < 0.001 ? 'HOLD' : change > 0 ? 'BUY' : 'SELL' as 'BUY' | 'SELL' | 'HOLD',
         executionCost: Math.abs(change) * 0.002 * (1 + Math.random()), // 0.2-0.4% execution cost
-        urgency: Math.abs(change) > 0.05 ? 'HIGH' : Math.abs(change) > 0.02 ? 'MEDIUM' : 'LOW'
+        urgency: Math.abs(change) > 0.05 ? 'HIGH' : Math.abs(change) > 0.02 ? 'MEDIUM' : 'LOW' as 'HIGH' | 'MEDIUM' | 'LOW'
       };
     }).sort((a, b) => Math.abs(b.change) - Math.abs(a.change));
 
@@ -93,9 +93,9 @@ const PortfolioOptimizerDashboard: React.FC = () => {
       .filter(c => c.action !== 'HOLD')
       .map(change => ({
         symbol: change.symbol,
-        strategy: change.urgency === 'HIGH' ? 'IMPLEMENTATION_SHORTFALL' :
+        strategy: (change.urgency === 'HIGH' ? 'IMPLEMENTATION_SHORTFALL' :
                  change.urgency === 'MEDIUM' ? 'TWAP' : 
-                 Math.abs(change.change) > 0.03 ? 'VWAP' : 'ARRIVAL_PRICE',
+                 Math.abs(change.change) > 0.03 ? 'VWAP' : 'ARRIVAL_PRICE') as 'TWAP' | 'VWAP' | 'IMPLEMENTATION_SHORTFALL' | 'ARRIVAL_PRICE',
         timeHorizon: change.urgency === 'HIGH' ? 120 : 
                     change.urgency === 'MEDIUM' ? 240 : 60, // minutes
         expectedCost: change.executionCost,

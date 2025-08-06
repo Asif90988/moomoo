@@ -42,10 +42,19 @@ interface TradingState {
   activePanel: string;
   layout: 'compact' | 'standard' | 'wide';
   
+  // Autonomous Trading State
+  isAutonomousActive: boolean;
+  autoTrades: any[];
+  aiDecisions: any[];
+  totalProfit: number;
+  baselineValue: number; // Track the starting portfolio value
+  
   // Actions
   setMarketData: (data: MarketData[]) => void;
   updateMarketData: (symbol: string, data: Partial<MarketData>) => void;
   setPortfolio: (portfolio: Portfolio) => void;
+  updatePortfolioValue: (value: number) => void;
+  resetPortfolioToBaseline: () => void;
   addOrder: (order: Order) => void;
   updateOrder: (orderId: string, updates: Partial<Order>) => void;
   removeOrder: (orderId: string) => void;
@@ -61,6 +70,16 @@ interface TradingState {
   setActivePanel: (panel: string) => void;
   setLayout: (layout: 'compact' | 'standard' | 'wide') => void;
   clearData: () => void;
+  
+  // Autonomous Trading Actions
+  setAutonomousActive: (active: boolean) => void;
+  addAutoTrade: (trade: any) => void;
+  addAiDecision: (decision: any) => void;
+  updateTotalProfit: (profit: number) => void;
+  updateTradeProfit: (tradeId: string, profit: number) => void;
+  syncPortfolioWithAI: () => void;
+  resetAutonomousState: () => void;
+  updateBaselineValue: (value: number) => void;
 }
 
 export const useTradingStore = create<TradingState>()(
@@ -86,8 +105,15 @@ export const useTradingStore = create<TradingState>()(
       selectedTimeframe: '1h',
       
       isLoading: false,
-      activePanel: 'trading',
+      activePanel: 'unified-ai-trading',
       layout: 'standard',
+      
+      // Autonomous Trading Initial State
+      isAutonomousActive: true, // Enable autonomous trading by default
+      autoTrades: [],
+      aiDecisions: [],
+      totalProfit: 0,
+      baselineValue: parseFloat(process.env.NEXT_PUBLIC_INITIAL_DEPOSIT || '1000'), // 🔴 LIVE ACCOUNT VALUE
       
       // Actions
       setMarketData: (data: MarketData[]) => {
@@ -112,10 +138,50 @@ export const useTradingStore = create<TradingState>()(
       },
       
       setPortfolio: (portfolio: Portfolio) => {
+        console.log('🔄 Store: Setting portfolio to:', portfolio.totalValue);
         set({ 
           portfolio,
           positions: portfolio.positions,
           orders: portfolio.orders
+        });
+      },
+      
+      updatePortfolioValue: (value: number) => {
+        const { portfolio } = get();
+        if (portfolio) {
+          console.log(`📊 Store: Updating portfolio value: $${portfolio.totalValue.toFixed(2)} → $${value.toFixed(2)}`);
+          const updatedPortfolio: Portfolio = {
+            ...portfolio,
+            totalValue: value,
+            cash: value - (portfolio.totalValue - portfolio.cash) // Maintain invested amount
+          };
+          set({ 
+            portfolio: updatedPortfolio,
+            positions: updatedPortfolio.positions,
+            orders: updatedPortfolio.orders
+          });
+        }
+      },
+      
+      resetPortfolioToBaseline: () => {
+        console.log('🔄 Store: Resetting portfolio to $300 baseline');
+        const baselinePortfolio: Portfolio = {
+          totalValue: 300.00,
+          cash: 300.00,
+          buyingPower: 300.00,
+          marginUsed: 0,
+          marginAvailable: 300.00,
+          dayPnl: 0.00,
+          dayPnlPercent: 0.00,
+          totalPnl: 0.00,
+          totalPnlPercent: 0.00,
+          positions: [],
+          orders: []
+        };
+        set({ 
+          portfolio: baselinePortfolio,
+          positions: [],
+          orders: []
         });
       },
       
@@ -192,6 +258,83 @@ export const useTradingStore = create<TradingState>()(
         set({ layout });
       },
       
+      // Autonomous Trading Actions
+      setAutonomousActive: (isAutonomousActive: boolean) => {
+        set({ isAutonomousActive });
+      },
+      
+      addAutoTrade: (trade: any) => {
+        const { autoTrades } = get();
+        set({ autoTrades: [trade, ...autoTrades.slice(0, 19)] }); // Keep last 20 trades
+      },
+      
+      addAiDecision: (decision: any) => {
+        const { aiDecisions } = get();
+        set({ aiDecisions: [decision, ...aiDecisions.slice(0, 9)] }); // Keep last 10 decisions
+      },
+      
+      updateTotalProfit: (profit: number) => {
+        const { totalProfit } = get();
+        set({ totalProfit: totalProfit + profit });
+      },
+      
+      updateTradeProfit: (tradeId: string, profit: number) => {
+        const { autoTrades } = get();
+        const updatedTrades = autoTrades.map(trade => 
+          trade.id === tradeId ? { ...trade, profit } : trade
+        );
+        set({ autoTrades: updatedTrades });
+      },
+      
+      syncPortfolioWithAI: () => {
+        const { baselineValue, totalProfit, portfolio, autoTrades } = get();
+        
+        // 🔧 FIX P&L CALCULATION - Calculate from actual trades
+        const realizedProfit = autoTrades.reduce((sum, trade) => {
+          return sum + (trade.profit || 0);
+        }, 0);
+        
+        // Only show P&L if there are actual trades
+        const displayPnL = autoTrades.length > 0 ? realizedProfit : 0;
+        const correctValue = baselineValue + displayPnL;
+        
+        if (portfolio && (Math.abs(portfolio.totalValue - correctValue) > 0.01 || portfolio.totalPnl !== displayPnL)) {
+          console.log(`🔄 SYNC: Portfolio was $${portfolio.totalValue.toFixed(2)}, correcting to $${correctValue.toFixed(2)} (baseline: $${baselineValue} + realized P&L: $${displayPnL.toFixed(2)} from ${autoTrades.length} trades)`);
+          
+          const correctedPortfolio = {
+            ...portfolio,
+            totalValue: correctValue,
+            cash: correctValue - (portfolio.totalValue - portfolio.cash), // Maintain invested amount
+            dayPnl: displayPnL,
+            dayPnlPercent: displayPnL !== 0 ? (displayPnL / baselineValue) * 100 : 0,
+            totalPnl: displayPnL,
+            totalPnlPercent: displayPnL !== 0 ? (displayPnL / baselineValue) * 100 : 0
+          };
+          
+          set({ 
+            portfolio: correctedPortfolio,
+            positions: correctedPortfolio.positions,
+            orders: correctedPortfolio.orders,
+            totalProfit: displayPnL // Keep totalProfit in sync
+          });
+        }
+      },
+      
+      resetAutonomousState: () => {
+        set({
+          isAutonomousActive: false,
+          autoTrades: [],
+          aiDecisions: [],
+          totalProfit: 0,
+          baselineValue: 300.00
+        });
+      },
+      
+      updateBaselineValue: (value: number) => {
+        console.log(`📊 Store: Updating baseline value to $${value.toFixed(2)}`);
+        set({ baselineValue: value });
+      },
+      
       clearData: () => {
         set({
           marketData: new Map(),
@@ -201,7 +344,12 @@ export const useTradingStore = create<TradingState>()(
           aiInsights: [],
           newsItems: [],
           chartData: null,
-          systemStatus: null
+          systemStatus: null,
+          // Also clear autonomous state
+          isAutonomousActive: false,
+          autoTrades: [],
+          aiDecisions: [],
+          totalProfit: 0
         });
       }
     })),

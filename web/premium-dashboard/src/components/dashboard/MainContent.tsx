@@ -3,7 +3,10 @@
 import { motion } from 'framer-motion';
 import { useTradingStore } from '@/stores/trading-store';
 import { TradingPanel } from './panels/TradingPanel';
+import TradingDashboard from '../trading/TradingDashboard';
+import AutonomousEngine from '../trading/AutonomousEngine';
 import { PortfolioPanel } from './panels/PortfolioPanel';
+import PortfolioDashboard from '../portfolio/PortfolioDashboard';
 import { AIBrainPanel } from './panels/AIBrainPanel';
 import AIBrainDashboard from '../ai/AIBrainDashboard';
 import { AIAgentsPanel } from './panels/AIAgentsPanel';
@@ -24,6 +27,13 @@ import PortfolioOptimizerDashboard from '../ml/PortfolioOptimizerDashboard';
 import RiskManagementDashboard from '../ml/RiskManagementDashboard';
 import AlternativeDataDashboard from '../ml/AlternativeDataDashboard';
 
+// Import Multi-Broker Panel
+import MultiBrokerPanel from './panels/MultiBrokerPanel';
+import BinanceCryptoPanel from './panels/BinanceCryptoPanel';
+import AITradingControlPanel from './panels/AITradingControlPanel';
+import UnifiedAITradingCenter from './panels/UnifiedAITradingCenter';
+import PremiumAICommandCenter from './panels/PremiumAICommandCenter';
+
 interface MainContentProps {
   layout: 'compact' | 'standard' | 'wide';
 }
@@ -32,11 +42,23 @@ export function MainContent({ layout }: MainContentProps) {
   const { activePanel } = useTradingStore();
 
   const renderPanel = () => {
+    console.log('🔍 Active panel:', activePanel);
     switch (activePanel) {
+      case 'unified-ai-trading':
+        console.log('📱 Loading Premium AI Command Center...');
+        return <PremiumAICommandCenter />;
+      case 'ai-control':
+        return <AITradingControlPanel />;
+      case 'autonomous':
+        return <UnifiedAITradingCenter />;
+      case 'multi-broker':
+        return <MultiBrokerPanel />;
+      case 'binance-crypto':
+        return <BinanceCryptoPanel />;
       case 'trading':
-        return <TradingPanel />;
+        return <TradingDashboard />;
       case 'portfolio':
-        return <PortfolioPanel />;
+        return <PortfolioDashboard />;
       case 'ai-brain':
         return <AIBrainDashboard />;
       case 'ai-agents':

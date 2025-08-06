@@ -45,7 +45,7 @@ const MLPredictionsDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedTimeHorizon, setSelectedTimeHorizon] = useState<'1h' | '4h' | '1d' | '1w'>('1d');
-  const [minConfidence, setMinConfidence] = useState(0.6);
+  const [minConfidence, setMinConfidence] = useState(0.1);
   const [showFactorAnalysis, setShowFactorAnalysis] = useState(false);
 
   // Sample symbols for demo

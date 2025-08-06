@@ -91,7 +91,7 @@ interface RiskConfiguration {
   riskAdjustmentSpeed: number;
 }
 
-export class RealTimeRiskManager {
+class RealTimeRiskManager {
   private config: RiskConfiguration;
   private positions: Map<string, Position> = new Map();
   private priceHistory: Map<string, number[]> = new Map();
@@ -734,7 +734,10 @@ export class RealTimeRiskManager {
 
 // Export types and main class
 export { 
-  RealTimeRiskManager, 
+  RealTimeRiskManager
+};
+
+export type { 
   RiskMetrics, 
   RiskAlert, 
   StressTestResult, 

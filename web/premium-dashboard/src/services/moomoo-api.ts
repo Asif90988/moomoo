@@ -342,13 +342,32 @@ export class MoomooAPIService {
     }
   }
 
-  // Connection test
+  // Connection test using JSON-RPC protocol (OpenD standard)
   async testConnection(): Promise<boolean> {
     try {
-      const response = await this.client.get('/health');
-      return response.status === 200;
+      // OpenD uses JSON-RPC protocol
+      const rpcRequest = {
+        jsonrpc: "2.0",
+        id: Date.now(),
+        method: "get_user_info",
+        params: {}
+      };
+      
+      const response = await this.client.post('/', rpcRequest, { 
+        timeout: 3000,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.status === 200 && response.data) {
+        console.log('✅ OpenD connected successfully via JSON-RPC');
+        return true;
+      }
+      
+      return false;
     } catch (error) {
-      console.error('Moomoo API connection test failed:', error);
+      console.error('Moomoo OpenD connection test failed:', error);
       return false;
     }
   }
@@ -368,3 +387,6 @@ export const defaultMoomooConfig: MoomooConfig = {
 
 // Export singleton instance
 export const moomooAPI = createMoomooAPI(defaultMoomooConfig);
+
+// Also export the class for type checking
+export { MoomooAPIService as MoomooAPI };

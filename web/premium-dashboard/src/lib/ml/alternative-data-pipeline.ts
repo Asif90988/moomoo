@@ -81,7 +81,7 @@ interface DataQualityMetrics {
   overallScore: number;
 }
 
-export class AlternativeDataPipeline {
+class AlternativeDataPipeline {
   private dataSources: Map<string, DataSource> = new Map();
   private dataBuffer: Map<string, AlternativeDataPoint[]> = new Map();
   private processingQueue: AlternativeDataPoint[] = [];
@@ -213,7 +213,7 @@ export class AlternativeDataPipeline {
     const dataMap = new Map<string, AlternativeDataPoint[]>();
     const fetchPromises: Promise<void>[] = [];
 
-    for (const [sourceName, source] of this.dataSources) {
+    for (const [sourceName, source] of Array.from(this.dataSources)) {
       if (!source.enabled) continue;
 
       const promise = this.fetchDataFromSource(source, symbols)
@@ -668,7 +668,7 @@ export class AlternativeDataPipeline {
       }
     }
 
-    return [...new Set(entities)]; // Remove duplicates
+    return Array.from(new Set(entities)); // Remove duplicates
   }
 
   private getSymbolSector(symbol: string): string {
@@ -769,6 +769,9 @@ export class AlternativeDataPipeline {
 // Export main class and interfaces
 export {
   AlternativeDataPipeline,
+}
+
+export type {
   DataSource,
   AlternativeDataPoint,
   SentimentData,

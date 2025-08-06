@@ -281,21 +281,25 @@ export class AIThoughtsService {
 
   // Future: Connect to actual Rust backend
   connectToRustBackend() {
+    // Temporarily disabled to prevent WebSocket timeout errors
+    console.log('🧠 AI Thoughts WebSocket connection disabled for development');
+    return;
+    
     try {
       this.ws = new WebSocket('ws://localhost:3001/ai-thoughts');
       
-      this.ws.onmessage = (event) => {
+      this.ws!.onmessage = (event) => {
         const rustThought: RustAIThought = JSON.parse(event.data);
         const humanThought = AIThoughtsTranslator.translateToHuman(rustThought);
         
         this.listeners.forEach(listener => listener(humanThought));
       };
       
-      this.ws.onopen = () => {
+      this.ws!.onopen = () => {
         console.log('🧠 Connected to Rust AI Thoughts backend');
       };
       
-      this.ws.onerror = (error) => {
+      this.ws!.onerror = (error) => {
         console.error('AI Thoughts WebSocket error:', error);
         // Fallback to simulation
         this.simulateRealAIThoughts();

@@ -1,20 +1,19 @@
 'use client';
 
-import { TradingDashboard } from '@/components/dashboard/TradingDashboard';
-import { WebSocketProvider } from '@/components/providers/WebSocketProvider';
-import { QueryProvider } from '@/components/providers/QueryProvider';
-import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Redirect to dashboard immediately
+    router.push('/dashboard');
+  }, [router]);
+
   return (
-    <ErrorBoundary>
-      <QueryProvider>
-        <WebSocketProvider>
-          <main className="h-screen w-screen overflow-hidden bg-neural-dark">
-            <TradingDashboard />
-          </main>
-        </WebSocketProvider>
-      </QueryProvider>
-    </ErrorBoundary>
+    <div className="min-h-screen w-full bg-neural-dark flex items-center justify-center">
+      <div className="text-white text-xl">Redirecting to dashboard...</div>
+    </div>
   );
 }

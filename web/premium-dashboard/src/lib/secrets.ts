@@ -4,7 +4,7 @@
 interface SecretConfig {
   // Database
   databaseUrl: string;
-  redisUrl: string;
+  redisUrl?: string;
   redisPassword?: string;
 
   // Authentication

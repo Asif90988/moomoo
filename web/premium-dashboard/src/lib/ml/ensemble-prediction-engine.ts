@@ -338,10 +338,10 @@ export class EnsemblePredictionEngine {
     }
     
     // Global average pooling and output
-    x = tf.layers.globalAveragePooling1d().apply(x) as tf.Tensor;
-    const output = tf.layers.dense({ units: 1, activation: 'linear' }).apply(x) as tf.Tensor;
+    x = tf.layers.globalAveragePooling1d().apply(x) as any;
+    const output = tf.layers.dense({ units: 1, activation: 'linear' }).apply(x) as any;
     
-    const model = tf.model({ inputs: input, outputs: output });
+    const model = tf.model({ inputs: input, outputs: output as tf.SymbolicTensor });
     
     model.compile({
       optimizer: tf.train.adam(0.0001),
@@ -710,7 +710,7 @@ export class EnsemblePredictionEngine {
     const performanceScores: Record<string, number> = {};
 
     // Calculate performance scores
-    for (const [modelName, performance] of this.modelPerformances) {
+    for (const [modelName, performance] of Array.from(this.modelPerformances)) {
       const score = (performance.accuracy * 0.4) + 
                    (performance.sharpeRatio * 0.3) + 
                    ((1 - performance.maxDrawdown) * 0.2) + 
@@ -787,7 +787,7 @@ export class EnsemblePredictionEngine {
   }
 
   private matrixMultiply(a: number[][], b: number[][]): number[][] {
-    const result = [];
+    const result: number[][] = [];
     for (let i = 0; i < a.length; i++) {
       result[i] = [];
       for (let j = 0; j < b[0].length; j++) {
@@ -845,7 +845,7 @@ export class EnsemblePredictionEngine {
     let bestScore = -Infinity;
     let worstScore = Infinity;
 
-    for (const [name, perf] of this.modelPerformances) {
+    for (const [name, perf] of Array.from(this.modelPerformances)) {
       const score = perf.accuracy + perf.sharpeRatio - perf.maxDrawdown;
       if (score > bestScore) {
         bestScore = score;
